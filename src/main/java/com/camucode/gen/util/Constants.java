@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 diego.silva.
+ * Copyright 2023 Diego Silva <diego.silva at apuntesdejava.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen;
-
-import java.util.ArrayList;
+package com.camucode.gen.util;
 
 /**
  *
- * @author diego.silva
+ * @author Diego Silva <diego.silva at apuntesdejava.com>
  */
-public class ClassDefinitionBuilder extends DefinitionBuilder {
+public class Constants {
 
-    ClassDefinitionBuilder(String packageDefinition, String className) {
-        super(packageDefinition, className);
-    }
-
-    @Override
-    protected void doBuildCode() {
-        codeLines = new ArrayList<>();
-    }
-
+    public static final String SEARCH_DOT = "\\.";
 }

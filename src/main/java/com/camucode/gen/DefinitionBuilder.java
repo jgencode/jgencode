@@ -15,19 +15,26 @@
  */
 package com.camucode.gen;
 
-import java.lang.reflect.AccessFlag;
+import com.camucode.gen.values.Modifier;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import org.apache.commons.lang3.ArrayUtils;
+import static com.camucode.gen.util.Constants.SEARCH_DOT;
 
 /**
  *
  * @author diego.silva@apuntesdejava.com
  */
-public class DefinitionBuilder {
+public abstract class DefinitionBuilder {
 
-    private final String packageDefinition;
-    private final String className;
-    private Set<AccessFlag> accessFlags = new LinkedHashSet<>();
+    protected final String packageDefinition;
+    protected final String className;
+    protected final Set<Modifier> modifiers = new LinkedHashSet<>();
+
+    protected List<String> codeLines;
 
     DefinitionBuilder(String packageDefinition, String className) {
         this.packageDefinition = packageDefinition;
@@ -37,8 +44,8 @@ public class DefinitionBuilder {
     /**
      * Create a builder for the definition of a class.
      *
-     * @param packageDefinition The definition of the package to which the class
-     * belongs. It should be separated by points, just like a package.
+     * @param packageDefinition The definition of the package to which the class belongs. It should be separated by
+     * points, just like a package.
      * @param className The name of the class to create
      * @return
      */
@@ -54,15 +61,57 @@ public class DefinitionBuilder {
         return className;
     }
 
-    public DefinitionBuilder addAccessFlag(AccessFlag accessFlag) {
-        this.accessFlags.add(accessFlag);
+    public DefinitionBuilder addModifier(Modifier modifier) {
+        this.modifiers.add(modifier);
         return this;
     }
-    public Definition build(){
-        return new Definition();
+
+    public Definition build() {
+        doBuildCode();
+        var definition = new Definition();
+        definition.className = className;
+        definition.modifiers = modifiers;
+        definition.packageDefinition = packageDefinition;
+        definition.packagePath = createPackagePath();
+        definition.codeLines = codeLines;
+        return definition;
     }
-    
-    public static class Definition{
-        
+
+    abstract protected void doBuildCode();
+
+    private Path createPackagePath() {
+        var packageDefinitionArray = packageDefinition.split(SEARCH_DOT);
+        return Paths.get(packageDefinitionArray[0], ArrayUtils.subarray(packageDefinitionArray, 1,
+            packageDefinitionArray.length));
+    }
+
+    public static class Definition {
+
+        private String className;
+        private Set<Modifier> modifiers;
+        private String packageDefinition;
+        private Path packagePath;
+        private List<String> codeLines;
+
+        public List<String> getCodeLines() {
+            return codeLines;
+        }
+
+        public String getClassName() {
+            return className;
+        }
+
+        public Set<Modifier> getModifiers() {
+            return modifiers;
+        }
+
+        public String getPackageDefinition() {
+            return packageDefinition;
+        }
+
+        public Path getPackagePath() {
+            return packagePath;
+        }
+
     }
 }

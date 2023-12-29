@@ -16,25 +16,51 @@
 package com.camucode.gen;
 
 import com.camucode.gen.DefinitionBuilder.Definition;
+
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- *
  * @author diego.silva
  */
 public class JavaFileBuilder {
 
+    private final Definition definition;
+    private final Path destinationPath;
+
+    private JavaFileBuilder(Definition definition, Path destinationPath) {
+        this.definition = definition;
+        this.destinationPath = destinationPath;
+    }
+
     public static class JavaFile {
+
+        private final Definition definition;
+        private final Path destinationPath;
+
+        private JavaFile(Definition definition, Path destinationPath) {
+            this.definition = definition;
+            this.destinationPath = destinationPath;
+        }
+
+        public Path writeFile() throws IOException {
+            Path javaFilePath = destinationPath.resolve(definition.getPackagePath())
+                .resolve(Path.of(String.format(
+                    "%s.java", definition.getClassName())));
+            Files.createDirectories(javaFilePath.getParent());
+            return Files.write(javaFilePath, definition.getCodeLines());
+        }
 
     }
 
-    public JavaFileBuilder createBuilder(Definition definition, Path destinationPath) {
-        JavaFileBuilder builder = new JavaFileBuilder();
+    public static JavaFileBuilder createBuilder(Definition definition, Path destinationPath) {
+        JavaFileBuilder builder = new JavaFileBuilder(definition, destinationPath);
         return builder;
     }
 
     public JavaFile build() {
-        JavaFile javaFile = new JavaFile();
+        JavaFile javaFile = new JavaFile(definition, destinationPath);
         return javaFile;
     }
 }
