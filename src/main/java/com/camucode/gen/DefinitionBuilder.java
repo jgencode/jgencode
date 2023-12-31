@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
 import static com.camucode.gen.util.Constants.SEARCH_DOT;
+import java.util.Collection;
 
 /**
  *
@@ -35,10 +36,15 @@ public abstract class DefinitionBuilder {
     protected final Set<Modifier> modifiers = new LinkedHashSet<>();
 
     protected List<String> codeLines;
+    protected Collection<FieldDefinitionBuilder.FieldDefinition> fields;
 
     DefinitionBuilder(String packageDefinition, String className) {
         this.packageDefinition = packageDefinition;
         this.className = className;
+    }
+
+    protected String getPackageDeclaration() {
+        return String.format("package %s;",packageDefinition);
     }
 
     /**
@@ -83,6 +89,11 @@ public abstract class DefinitionBuilder {
         var packageDefinitionArray = packageDefinition.split(SEARCH_DOT);
         return Paths.get(packageDefinitionArray[0], ArrayUtils.subarray(packageDefinitionArray, 1,
             packageDefinitionArray.length));
+    }
+
+    public DefinitionBuilder addFields(Collection<FieldDefinitionBuilder.FieldDefinition> fieldsDefinition) {
+        this.fields = fieldsDefinition;
+        return this;
     }
 
     public static class Definition {

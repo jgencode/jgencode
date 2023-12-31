@@ -13,14 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen.util;
+package com.camucode.gen.type;
 
 /**
  *
  * @author Diego Silva <diego.silva at apuntesdejava.com>
  */
-public class Constants {
+public class ClassType {
 
-    public static final String SEARCH_DOT = "\\.";
-    public static final String SEMI_COLON = ";";
+    private final String packageName;
+    private final String className;
+
+    private ClassType(String packageName, String className) {
+        this.packageName = packageName;
+        this.className = className;
+    }
+
+    public static ClassType createClassTypeWithPackageAndName(String packageName, String className) {
+        return new ClassType(packageName, className);
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    public String getFullClassName() {
+        return String.format("%s.%s", packageName, className);
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
 }

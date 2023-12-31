@@ -15,10 +15,24 @@
  */
 package com.camucode.gen.values;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Collection;
+import java.util.Set;
+
 /**
- *
  * @author Diego Silva <diego.silva at apuntesdejava.com>
  */
 public enum Modifier {
-    PUBLIC, PRIVATE, PROTECTED, FINAL, ABSTRACT, STATIC
+    PUBLIC, PRIVATE, PROTECTED, FINAL, ABSTRACT, STATIC;
+    public static final Set<Modifier> ACCESS_MODIFIERS = Set.of(Modifier.PUBLIC, Modifier.PRIVATE, Modifier.PROTECTED);
+
+    public static String currentAccessModifier(Collection<Modifier> modifiers) {
+        for (Modifier modifier : Modifier.ACCESS_MODIFIERS) {
+            if (modifiers.contains(modifier)) {
+                return StringUtils.lowerCase(modifier.name());
+            }
+        }
+        return StringUtils.EMPTY;
+    }
 }
