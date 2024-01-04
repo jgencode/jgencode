@@ -24,6 +24,7 @@ import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
 import static com.camucode.gen.util.Constants.SEARCH_DOT;
 import java.util.Collection;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -38,13 +39,19 @@ public abstract class DefinitionBuilder {
     protected List<String> codeLines;
     protected Collection<FieldDefinitionBuilder.FieldDefinition> fields;
 
+    protected int spaceIndent = 2;
+
+    String getIndentation(int level) {
+        return StringUtils.repeat(StringUtils.SPACE, spaceIndent * level);
+    }
+
     DefinitionBuilder(String packageDefinition, String className) {
         this.packageDefinition = packageDefinition;
         this.className = className;
     }
 
     protected String getPackageDeclaration() {
-        return String.format("package %s;",packageDefinition);
+        return String.format("package %s;", packageDefinition);
     }
 
     /**

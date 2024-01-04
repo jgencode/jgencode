@@ -19,9 +19,12 @@ import com.camucode.gen.values.Modifier;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author diego.silva
@@ -49,14 +52,20 @@ public class ClassDefinitionBuilder extends DefinitionBuilder {
         codeLines.add(System.lineSeparator());
 
         codeLines.addAll(createFields());
-        codeLines.add(System.lineSeparator());
+
+        codeLines.addAll(createAccessors());
 
         codeLines.add("}");
     }
 
     private List<String> createFields() {
-        List<String> lines = new ArrayList<>();
-        fields.forEach(field -> lines.add(String.format("  %s%n", field.sourceLine)));
+        if (fields.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<String> lines = fields.stream()
+            .map(field -> String.format("%s%s%n", getIndentation(1), field.sourceLine))
+            .collect(toList());
+        lines.add(System.lineSeparator());
         return lines;
     }
 
@@ -67,6 +76,32 @@ public class ClassDefinitionBuilder extends DefinitionBuilder {
             .map(field -> field.getClassType().getFullClassName())
             .filter(StringUtils::isNotBlank)
             .collect(Collectors.toSet());
+    }
+
+    private Collection<? extends String> createAccessors() {
+        if (fields.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<String> lines = new ArrayList<>();
+        fields.forEach(field -> {
+            if (field.isSetter()) {
+                var fieldCapitalized = StringUtils.capitalize(field.getFieldName());
+                var fieldType = field.getFieldType();
+                lines.add(String.format("%spublic void set%s(%s %s){", getIndentation(1), fieldCapitalized, fieldType,
+                    field.getFieldName()));
+                lines.add(String.format("%1$sthis.%2$s = %2$s;", getIndentation(2), field.getFieldName()));
+                lines.add(String.format("%s}%n", getIndentation(1)));
+            }
+            if (field.isGetter()) {
+                var fieldCapitalized = StringUtils.capitalize(field.getFieldName());
+                var fieldType = field.getFieldType();
+                lines.add(String.format("%spublic %s get%s(){", getIndentation(1), fieldType, fieldCapitalized));
+                lines.add(String.format("%1$sreturn %2$s;", getIndentation(2), field.getFieldName()));
+                lines.add(String.format("%s}%n", getIndentation(1)));
+            }
+        });
+        lines.add(System.lineSeparator());
+        return lines;
     }
 
 }
