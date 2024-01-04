@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static com.camucode.gen.util.Constants.SEMI_COLON;
+import java.util.Optional;
 
 /**
  * @author Diego Silva <diego.silva at apuntesdejava.com>
@@ -114,6 +115,10 @@ public class FieldDefinitionBuilder {
 
         public String getFieldName() {
             return fieldName;
+        }
+        
+        public String getFieldType(){
+            return Optional.ofNullable(classType).map(ClassType::getClassName).orElse(nativeType);
         }
 
         public String getNativeType() {
