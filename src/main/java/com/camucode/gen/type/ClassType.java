@@ -15,6 +15,9 @@
  */
 package com.camucode.gen.type;
 
+import static com.camucode.gen.util.Constants.LESS_THAN;
+import org.apache.commons.lang3.StringUtils;
+
 /**
  *
  * @author Diego Silva <diego.silva at apuntesdejava.com>
@@ -23,10 +26,12 @@ public class ClassType {
 
     private final String packageName;
     private final String className;
+    private final String classNameNoGeneric;
 
     private ClassType(String packageName, String className) {
         this.packageName = packageName;
         this.className = className;
+        this.classNameNoGeneric = StringUtils.substringBefore(className, LESS_THAN);
     }
 
     public static ClassType createClassTypeWithPackageAndName(String packageName, String className) {
@@ -38,7 +43,10 @@ public class ClassType {
     }
 
     public String getFullClassName() {
-        return String.format("%s.%s", packageName, className);
+        if (StringUtils.isBlank(packageName)) {
+            return classNameNoGeneric;
+        }
+        return String.format("%s.%s", packageName, classNameNoGeneric);
     }
 
     public String getClassName() {
