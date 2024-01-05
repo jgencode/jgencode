@@ -72,7 +72,8 @@ public class ClassDefinitionBuilder extends DefinitionBuilder {
     private Set<String> importClasses() {
         //from fields
         return fields.stream()
-            .filter(field -> field.getClassType() != null)
+            .filter(field -> field.getClassType() != null && StringUtils.isNotBlank(
+            field.getClassType().getPackageName()))
             .map(field -> field.getClassType().getFullClassName())
             .filter(StringUtils::isNotBlank)
             .collect(Collectors.toSet());
