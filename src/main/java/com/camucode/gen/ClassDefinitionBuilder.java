@@ -22,9 +22,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import static java.util.stream.Collectors.toList;
 
 /**
  * @author diego.silva
@@ -41,7 +38,6 @@ public class ClassDefinitionBuilder extends DefinitionBuilder {
         codeLines.add(getPackageDeclaration());
         codeLines.add(System.lineSeparator());
         var classesToImport = importClasses();
-        classesToImport.forEach(classToImport -> codeLines.add(String.format("import %s;", classToImport)));
         var classDeclaration = new StringBuilder();
         classDeclaration.append(Modifier.currentAccessModifier(modifiers));
         classDeclaration.append(StringUtils.SPACE).append("class").append(StringUtils.SPACE);
@@ -56,27 +52,6 @@ public class ClassDefinitionBuilder extends DefinitionBuilder {
         codeLines.addAll(createAccessors());
 
         codeLines.add("}");
-    }
-
-    private List<String> createFields() {
-        if (fields.isEmpty()) {
-            return Collections.emptyList();
-        }
-        List<String> lines = fields.stream()
-            .map(field -> String.format("%s%s%n", getIndentation(1), field.sourceLine))
-            .collect(toList());
-        lines.add(System.lineSeparator());
-        return lines;
-    }
-
-    private Set<String> importClasses() {
-        //from fields
-        return fields.stream()
-            .filter(field -> field.getClassType() != null && StringUtils.isNotBlank(
-            field.getClassType().getPackageName()))
-            .map(field -> field.getClassType().getFullClassName())
-            .filter(StringUtils::isNotBlank)
-            .collect(Collectors.toSet());
     }
 
     private Collection<? extends String> createAccessors() {
