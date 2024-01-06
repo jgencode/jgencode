@@ -24,6 +24,9 @@ import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
 import static com.camucode.gen.util.Constants.SEARCH_DOT;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.Collectors;
+import static java.util.stream.Collectors.toList;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -66,6 +69,10 @@ public abstract class DefinitionBuilder {
         return new ClassDefinitionBuilder(packageDefinition, className);
     }
 
+    public static InterfaceDefinitionBuilder createInterfaceBuilder(String packageDefinition, String interfaceName) {
+        return new InterfaceDefinitionBuilder(packageDefinition, interfaceName);
+    }
+
     public String getPackageDefinition() {
         return packageDefinition;
     }
@@ -101,6 +108,30 @@ public abstract class DefinitionBuilder {
     public DefinitionBuilder addFields(Collection<FieldDefinitionBuilder.FieldDefinition> fieldsDefinition) {
         this.fields = fieldsDefinition;
         return this;
+    }
+
+    protected List<String> createFields() {
+        if (fields == null || fields.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<String> lines = fields.stream().map(field -> String.format("%s%s%n", getIndentation(1), field.sourceLine)).collect(
+            toList());
+        lines.add(System.lineSeparator());
+        return lines;
+    }
+
+    protected Set<String> importClasses() {
+        if (fields == null || fields.isEmpty()) {
+            return Collections.emptySet();
+        }
+        //from fields
+        Set<String> classesToImport = fields.stream().filter(
+            field -> field.getClassType() != null && StringUtils.isNotBlank(
+            field.getClassType().getPackageName())).map(field -> field.getClassType().getFullClassName()).filter(
+            StringUtils::isNotBlank).collect(Collectors.toSet());
+        classesToImport.forEach(classToImport -> codeLines.add(String.format("import %s;", classToImport)));
+
+        return classesToImport;
     }
 
     public static class Definition {
