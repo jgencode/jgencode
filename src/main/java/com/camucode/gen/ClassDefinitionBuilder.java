@@ -37,7 +37,7 @@ public class ClassDefinitionBuilder extends DefinitionBuilder {
         codeLines = new ArrayList<>();
         codeLines.add(getPackageDeclaration());
         codeLines.add(System.lineSeparator());
-        var classesToImport = importClasses();
+        importClasses();
         var classDeclaration = new StringBuilder();
         classDeclaration.append(Modifier.currentAccessModifier(modifiers));
         classDeclaration.append(StringUtils.SPACE).append("class").append(StringUtils.SPACE);
