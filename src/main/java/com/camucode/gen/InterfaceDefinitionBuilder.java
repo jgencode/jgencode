@@ -15,36 +15,80 @@
  */
 package com.camucode.gen;
 
+import com.camucode.gen.type.ClassType;
+import com.camucode.gen.util.Constants;
 import com.camucode.gen.values.Modifier;
+
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- *
  * @author Diego Silva <diego.silva at apuntesdejava.com>
  */
 public class InterfaceDefinitionBuilder extends DefinitionBuilder {
-
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(InterfaceDefinitionBuilder.class);
+    
+    private final List<ClassType> interfacesExtends = new LinkedList<>();
+    
     InterfaceDefinitionBuilder(String packageDefinition, String className) {
         super(packageDefinition, className);
     }
-
+    
+    public DefinitionBuilder addInterfaceExtend(ClassType interfaceType) {
+        interfacesExtends.add(interfaceType);
+        return this;
+    }
+    
     @Override
     protected void doBuildCode() {
         codeLines = new ArrayList<>();
         codeLines.add(getPackageDeclaration());
         codeLines.add(System.lineSeparator());
-        importClasses();
-
+        
         var classDeclaration = new StringBuilder();
         classDeclaration.append(Modifier.currentAccessModifier(modifiers));
         classDeclaration.append(StringUtils.SPACE).append("interface").append(StringUtils.SPACE);
         classDeclaration.append(className);
+        addInterfacesExtendsCode(classDeclaration);
         classDeclaration.append('{');
-
+        
+        importClasses();
         codeLines.add(classDeclaration.toString());
-
+        
         codeLines.add("}");
     }
-
+    
+    private void addInterfacesExtendsCode(StringBuilder classDeclaration) {
+        var interfacesExtendsCode = interfacesExtends.stream().map(interfaceExtend -> {
+            var declaration = new StringBuilder(interfaceExtend.getClassName());
+            if (interfaceExtend.getGenerics() != null) {
+                declaration.append(Constants.LESS_THAN);
+                var params
+                    = interfaceExtend.getGenerics().values().stream().map(genericType -> {
+                        if (genericType instanceof ClassType) {
+                            var genericTypeParam = (ClassType) genericType;
+                            var classToImport = genericTypeParam.getFullClassName();
+                            classesToImport.add(classToImport);
+                            return genericTypeParam.getClassName();
+                        }
+                        return (String) genericType;
+                        
+                    }).collect(Collectors.joining(","));
+                declaration.append(params);
+                declaration.append(Constants.MORE_THAN);
+            }
+            return declaration.toString();
+        }).collect(Collectors.joining(","));
+        if (StringUtils.isNotBlank(interfacesExtendsCode)) {
+            classDeclaration.append(" extends ").append(interfacesExtendsCode);
+        }
+    }
+    
 }
