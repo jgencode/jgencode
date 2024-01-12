@@ -24,4 +24,5 @@ public class Constants {
     public static final String SEARCH_DOT = "\\.";
     public static final String SEMI_COLON = ";";
     public static final String LESS_THAN = "<";
+    public static final String MORE_THAN = ">";
 }

@@ -16,6 +16,7 @@
 package com.camucode.gen.type;
 
 import static com.camucode.gen.util.Constants.LESS_THAN;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -27,8 +28,9 @@ public class ClassType {
     private final String packageName;
     private final String className;
     private final String classNameNoGeneric;
+    Map<String, Object> generics;
 
-    private ClassType(String packageName, String className) {
+    ClassType(String packageName, String className) {
         this.packageName = packageName;
         this.className = className;
         this.classNameNoGeneric = StringUtils.substringBefore(className, LESS_THAN);
@@ -51,6 +53,10 @@ public class ClassType {
 
     public String getClassName() {
         return className;
+    }
+
+    public Map<String, Object> getGenerics() {
+        return generics;
     }
 
 }
