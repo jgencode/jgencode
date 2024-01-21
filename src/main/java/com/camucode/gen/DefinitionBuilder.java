@@ -60,15 +60,15 @@ public abstract class DefinitionBuilder {
     }
 
     protected String getPackageDeclaration() {
-        return String.format("package %s;", packageDefinition);
+        return String.format("package %s;%n", packageDefinition);
     }
 
     /**
      * Create a builder for the definition of a class.
      *
      * @param packageDefinition The definition of the package to which the class belongs. It should be separated by
-     *                          points, just like a package.
-     * @param className         The name of the class to create
+     * points, just like a package.
+     * @param className The name of the class to create
      * @return
      */
     public static ClassDefinitionBuilder createClassBuilder(String packageDefinition, String className) {
@@ -130,14 +130,14 @@ public abstract class DefinitionBuilder {
     protected void importClasses() {
 
         //from fields
-        if (fields != null)
+        if (fields != null) {
             classesToImport.addAll(fields.stream().filter(
-                    field -> field.getClassType() != null && StringUtils.isNotBlank(
-                        field.getClassType().getPackageName())).map(field -> field.getClassType().getFullClassName())
+                field -> field.getClassType() != null && StringUtils.isNotBlank(
+                field.getClassType().getPackageName())).map(field -> field.getClassType().getFullClassName())
                 .filter(
                     StringUtils::isNotBlank).collect(Collectors.toSet()));
+        }
         classesToImport.forEach(classToImport -> codeLines.add(String.format("import %s;", classToImport)));
-
     }
 
     public static class Definition {
