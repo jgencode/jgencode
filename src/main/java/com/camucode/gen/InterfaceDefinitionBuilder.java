@@ -16,32 +16,33 @@
 package com.camucode.gen;
 
 import com.camucode.gen.type.ClassType;
+import com.camucode.gen.values.Modifier;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.camucode.gen.util.Constants.COMMA;
 import static com.camucode.gen.util.Constants.COMMA_SPACE;
 import static com.camucode.gen.util.Constants.GENERAL_CLASSES;
 import static com.camucode.gen.util.Constants.LESS_THAN;
 import static com.camucode.gen.util.Constants.MORE_THAN;
-
-import com.camucode.gen.values.Modifier;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author Diego Silva <diego.silva at apuntesdejava.com>
  */
-public class InterfaceDefinitionBuilder extends DefinitionBuilder {
+public class InterfaceDefinitionBuilder extends DefinitionBuilder implements DefinitionBuilderWithMethods {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InterfaceDefinitionBuilder.class);
 
     private final List<ClassType> interfacesExtends = new LinkedList<>();
+    private Collection<MethodDefinitionBuilder.MethodDefinition> methods;
 
     InterfaceDefinitionBuilder(String packageDefinition, String className) {
         super(packageDefinition, className);
@@ -64,10 +65,29 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder {
         addInterfacesExtendsCode(classDeclaration);
         classDeclaration.append('{');
 
+        importClassesFromMethods();
+
         importClasses();
         codeLines.add(classDeclaration.toString());
 
+        if (methods != null) {
+            methods.forEach(method -> codeLines.addAll(method.getSourceLines().stream().map(
+                line -> String.format("%s%s", getIndentation(1), line)).collect(toList()))
+            );
+        }
+
         codeLines.add("}");
+    }
+
+    private void importClassesFromMethods() {
+        LOGGER.debug("getting the classes that are used in the methods");
+        if (methods == null) {
+            return;
+        }
+        methods.forEach(method -> {
+            var returnType = method.getReturnType();
+            classesToImport.add(returnType.getFullClassName());
+        });
     }
 
     private void addInterfacesExtendsCode(StringBuilder classDeclaration) {
@@ -97,6 +117,12 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder {
         if (StringUtils.isNotBlank(interfacesExtendsCode)) {
             classDeclaration.append(" extends ").append(interfacesExtendsCode);
         }
+    }
+
+    @Override
+    public DefinitionBuilderWithMethods addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methods) {
+        this.methods = methods;
+        return this;
     }
 
 }

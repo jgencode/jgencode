@@ -15,8 +15,11 @@
  */
 package com.camucode.gen.type;
 
+import static com.camucode.gen.util.Constants.COMMA;
 import static com.camucode.gen.util.Constants.LESS_THAN;
+import static com.camucode.gen.util.Constants.MORE_THAN;
 import java.util.Map;
+import static java.util.stream.Collectors.toList;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -53,6 +56,16 @@ public class ClassType {
 
     public String getClassName() {
         return className;
+    }
+
+    public String getClassNameWithGeneric() {
+        if (generics == null) {
+            return className;
+        }
+        return String.format("%s%s%s%s", className, LESS_THAN, String.join(COMMA, generics.values().stream().map(
+            type -> type instanceof ClassType ? ((ClassType) type).getClassNameWithGeneric() : (String) type).collect(
+                toList())),
+            MORE_THAN);
     }
 
     public Map<String, Object> getGenerics() {

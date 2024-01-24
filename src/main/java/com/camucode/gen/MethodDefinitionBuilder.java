@@ -18,7 +18,6 @@ package com.camucode.gen;
 import com.camucode.gen.type.ClassType;
 import com.camucode.gen.values.Modifier;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -27,7 +26,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,15 +94,19 @@ public class MethodDefinitionBuilder {
     private List<String> createSourceLines() {
         StringBuilder sourceString = new StringBuilder();
         sourceString.append(Modifier.currentMethodAccessModifier(modifiers));
-        sourceString.append(SPACE);
+        if (sourceString.length() > 0) {
+            sourceString.append(SPACE);
+        }
         Optional.ofNullable(returnType)
-            .ifPresentOrElse(type -> sourceString.append(type.getFullClassName()), () -> sourceString.append("void"));
+            .ifPresentOrElse(type -> sourceString.append(type.getClassNameWithGeneric()), () -> sourceString.append(
+            "void"));
 
         sourceString.append(SPACE).append(name);
         sourceString.append("(");
         sourceString.append(")");
-        if (isAbstract) sourceString.append(";");
-        else {
+        if (isAbstract) {
+            sourceString.append(";");
+        } else {
             sourceString.append("{\n");
             sourceString.append("}");
         }
