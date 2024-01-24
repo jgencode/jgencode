@@ -23,5 +23,12 @@ import java.util.Collection;
  */
 public interface DefinitionBuilderWithMethods {
 
+    /**
+     * Adds a method definition collection to the current class builder
+     *
+     * @param methods A collection of method definitions. See
+     * #{@link com.camucode.gen.MethodDefinitionBuilder.MethodDefinition}
+     * @return The current builder instance
+     */
     DefinitionBuilderWithMethods addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methods);
 }
