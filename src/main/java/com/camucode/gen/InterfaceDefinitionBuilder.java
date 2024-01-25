@@ -87,6 +87,9 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
         methods.forEach(method -> {
             var returnType = method.getReturnType();
             classesToImport.add(returnType.getFullClassName());
+            classesToImport.addAll(method.getParameters().values().stream().map(ClassType::getFullClassName).collect(
+                toList()));
+
         });
     }
 

@@ -17,6 +17,8 @@ package com.camucode.gen;
 
 import com.camucode.gen.type.ClassType;
 import com.camucode.gen.values.Modifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -26,9 +28,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import static com.camucode.gen.util.Constants.COMMA;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
 /**
@@ -99,10 +99,13 @@ public class MethodDefinitionBuilder {
         }
         Optional.ofNullable(returnType)
             .ifPresentOrElse(type -> sourceString.append(type.getClassNameWithGeneric()), () -> sourceString.append(
-            "void"));
+                "void"));
 
         sourceString.append(SPACE).append(name);
         sourceString.append("(");
+
+        insertParameters(sourceString);
+
         sourceString.append(")");
         if (isAbstract) {
             sourceString.append(";");
@@ -112,6 +115,13 @@ public class MethodDefinitionBuilder {
         }
 
         return sourceString.toString().lines().collect(Collectors.toList());
+    }
+
+    private void insertParameters(StringBuilder sourceString) {
+        if (parameters.isEmpty()) return;
+        sourceString.append(parameters.entrySet().stream().map(parameter -> String.format("%s %s",
+            parameter.getValue().getClassNameWithGeneric(),
+            parameter.getKey())).collect(Collectors.joining(COMMA)));
     }
 
     public static class MethodDefinition {

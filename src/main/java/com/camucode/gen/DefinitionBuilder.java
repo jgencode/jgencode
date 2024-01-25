@@ -29,6 +29,7 @@ import static com.camucode.gen.util.Constants.SEARCH_DOT;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -45,7 +46,7 @@ public abstract class DefinitionBuilder {
     protected final Set<Modifier> modifiers = new LinkedHashSet<>();
 
     protected List<String> codeLines;
-    protected Set<String> classesToImport = new LinkedHashSet<>();
+    protected Set<String> classesToImport = new TreeSet<>();
     protected Collection<FieldDefinitionBuilder.FieldDefinition> fields;
 
     protected int spaceIndent = 2;
