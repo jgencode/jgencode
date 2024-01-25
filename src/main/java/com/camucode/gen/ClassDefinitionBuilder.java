@@ -32,6 +32,10 @@ public class ClassDefinitionBuilder extends DefinitionBuilder {
         super(packageDefinition, className);
     }
 
+    /**
+     * Builds the code according to the values assigned in its properties. The result is saved in {@link #codeLines}
+     * internal property
+     */
     @Override
     protected void doBuildCode() {
         codeLines = new ArrayList<>();

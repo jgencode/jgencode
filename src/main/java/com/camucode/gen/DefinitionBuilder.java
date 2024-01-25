@@ -29,6 +29,7 @@ import static com.camucode.gen.util.Constants.SEARCH_DOT;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -45,7 +46,7 @@ public abstract class DefinitionBuilder {
     protected final Set<Modifier> modifiers = new LinkedHashSet<>();
 
     protected List<String> codeLines;
-    protected Set<String> classesToImport = new LinkedHashSet<>();
+    protected Set<String> classesToImport = new TreeSet<>();
     protected Collection<FieldDefinitionBuilder.FieldDefinition> fields;
 
     protected int spaceIndent = 2;
@@ -60,15 +61,15 @@ public abstract class DefinitionBuilder {
     }
 
     protected String getPackageDeclaration() {
-        return String.format("package %s;", packageDefinition);
+        return String.format("package %s;%n", packageDefinition);
     }
 
     /**
      * Create a builder for the definition of a class.
      *
      * @param packageDefinition The definition of the package to which the class belongs. It should be separated by
-     *                          points, just like a package.
-     * @param className         The name of the class to create
+     * points, just like a package.
+     * @param className The name of the class to create
      * @return
      */
     public static ClassDefinitionBuilder createClassBuilder(String packageDefinition, String className) {
@@ -130,14 +131,14 @@ public abstract class DefinitionBuilder {
     protected void importClasses() {
 
         //from fields
-        if (fields != null)
+        if (fields != null) {
             classesToImport.addAll(fields.stream().filter(
-                    field -> field.getClassType() != null && StringUtils.isNotBlank(
-                        field.getClassType().getPackageName())).map(field -> field.getClassType().getFullClassName())
+                field -> field.getClassType() != null && StringUtils.isNotBlank(
+                field.getClassType().getPackageName())).map(field -> field.getClassType().getFullClassName())
                 .filter(
                     StringUtils::isNotBlank).collect(Collectors.toSet()));
+        }
         classesToImport.forEach(classToImport -> codeLines.add(String.format("import %s;", classToImport)));
-
     }
 
     public static class Definition {

@@ -26,9 +26,21 @@ import java.util.Set;
 public enum Modifier {
     PUBLIC, PRIVATE, PROTECTED, FINAL, ABSTRACT, STATIC;
     public static final Set<Modifier> ACCESS_MODIFIERS = Set.of(Modifier.PUBLIC, Modifier.PRIVATE, Modifier.PROTECTED);
+    public static final Set<Modifier> METHOD_ACCESS_MODIFIERS = Set.of(Modifier.PUBLIC,
+        Modifier.PRIVATE,
+        Modifier.PROTECTED, ABSTRACT, STATIC);
 
     public static String currentAccessModifier(Collection<Modifier> modifiers) {
         for (Modifier modifier : Modifier.ACCESS_MODIFIERS) {
+            if (modifiers.contains(modifier)) {
+                return StringUtils.lowerCase(modifier.name());
+            }
+        }
+        return StringUtils.EMPTY;
+    }
+
+    public static String currentMethodAccessModifier(Collection<Modifier> modifiers) {
+        for (Modifier modifier : Modifier.METHOD_ACCESS_MODIFIERS) {
             if (modifiers.contains(modifier)) {
                 return StringUtils.lowerCase(modifier.name());
             }

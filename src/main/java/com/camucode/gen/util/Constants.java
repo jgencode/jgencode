@@ -15,8 +15,12 @@
  */
 package com.camucode.gen.util;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Map;
+import java.util.UUID;
+
 /**
- *
  * @author Diego Silva <diego.silva at apuntesdejava.com>
  */
 public class Constants {
@@ -25,4 +29,9 @@ public class Constants {
     public static final String SEMI_COLON = ";";
     public static final String LESS_THAN = "<";
     public static final String MORE_THAN = ">";
+    public static final String COMMA = ",";
+    public static final String COMMA_SPACE = ", ";
+
+    public static final Map<String, String> GENERAL_CLASSES = Map.of("UUID", UUID.class.getName(), "LocalDate",
+        LocalDate.class.getName(), "LocalDateTime", LocalDateTime.class.getName());
 }
