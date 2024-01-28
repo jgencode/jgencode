@@ -15,21 +15,44 @@
  */
 package com.camucode.gen;
 
+import com.camucode.gen.type.ClassType;
 import com.camucode.gen.values.Modifier;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * @author diego.silva
  */
-public class ClassDefinitionBuilder extends DefinitionBuilder {
+public class ClassDefinitionBuilder extends DefinitionBuilder implements DefinitionBuilderWithMethods {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClassDefinitionBuilder.class);
+
+    private Collection<MethodDefinitionBuilder.MethodDefinition> methods;
 
     ClassDefinitionBuilder(String packageDefinition, String className) {
         super(packageDefinition, className);
+    }
+
+    private void importClassesFromMethods() {
+        LOGGER.debug("getting the classes that are used in the methods");
+        if (methods == null) {
+            return;
+        }
+        methods.forEach(method -> {
+            var returnType = method.getReturnType();
+            classesToImport.add(returnType.getFullClassName());
+            classesToImport.addAll(method.getParameters().values().stream().map(ClassType::getFullClassName).collect(
+                toList()));
+
+        });
     }
 
     /**
@@ -41,6 +64,7 @@ public class ClassDefinitionBuilder extends DefinitionBuilder {
         codeLines = new ArrayList<>();
         codeLines.add(getPackageDeclaration());
         codeLines.add(System.lineSeparator());
+        importClassesFromMethods();
         importClasses();
         var classDeclaration = new StringBuilder();
         classDeclaration.append(Modifier.currentAccessModifier(modifiers));
@@ -54,6 +78,12 @@ public class ClassDefinitionBuilder extends DefinitionBuilder {
         codeLines.addAll(createFields());
 
         codeLines.addAll(createAccessors());
+
+        if (methods != null) {
+            methods.forEach(method -> codeLines.addAll(method.getSourceLines().stream().map(
+                line -> String.format("%s%s", getIndentation(1), line)).collect(toList()))
+            );
+        }
 
         codeLines.add("}");
     }
@@ -82,6 +112,12 @@ public class ClassDefinitionBuilder extends DefinitionBuilder {
         });
         lines.add(System.lineSeparator());
         return lines;
+    }
+
+    @Override
+    public DefinitionBuilderWithMethods addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methods) {
+        this.methods = methods;
+        return this;
     }
 
 }
