@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Diego Silva <diego.silva at apuntesdejava.com>.
+ * Copyright 2023 Diego Silva diego.silva at apuntesdejava.com.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * @author Diego Silva <diego.silva at apuntesdejava.com>
+ * @author Diego Silva diego.silva at apuntesdejava.com
  */
 public class ClassType {
 
