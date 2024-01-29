@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Diego Silva <diego.silva at apuntesdejava.com>.
+ * Copyright 2024 Diego Silva diego.silva at apuntesdejava.com.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import static com.camucode.gen.util.Constants.MORE_THAN;
 import static java.util.stream.Collectors.toList;
 
 /**
- * @author Diego Silva <diego.silva at apuntesdejava.com>
+ * @author Diego Silva diego.silva at apuntesdejava.com
  */
 public class InterfaceDefinitionBuilder extends DefinitionBuilder implements DefinitionBuilderWithMethods {
 
