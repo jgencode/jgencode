@@ -15,8 +15,14 @@
  */
 package com.camucode.gen.type;
 
+import com.camucode.gen.util.ClassUtil;
+import com.camucode.gen.util.Constants;
+import static com.camucode.gen.util.Constants.GENERAL_CLASSES;
+import static com.camucode.gen.util.Constants.LESS_THAN;
+import static com.camucode.gen.util.Constants.MORE_THAN;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -38,9 +44,22 @@ public class ClassTypeBuilder {
     }
 
     public ClassTypeBuilder className(String className) {
-        this.className = className;
+        if (StringUtils.contains(className, LESS_THAN) && StringUtils.endsWith(className, MORE_THAN)) {
+            String generic = StringUtils.substringBetween(className, LESS_THAN, MORE_THAN);
+            addGeneric("T", ClassTypeBuilder.newBuilder()
+                .className(generic)
+                .packageName(packageName)
+                .build());
+            this.className = StringUtils.substringBefore(className, LESS_THAN);
+            if (Constants.GENERAL_CLASSES.containsKey(this.className)) {
+                packageName = ClassUtil.removeClassFromPackage(GENERAL_CLASSES.get(this.className), this.className);
+            }
+        } else {
+            this.className = className;
+        }
         return this;
     }
+
 
     public ClassTypeBuilder addGeneric(String key, Object genericClass) {
         generics.put(key, genericClass);

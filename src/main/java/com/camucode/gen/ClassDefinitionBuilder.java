@@ -23,8 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -47,10 +48,26 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
             return;
         }
         methods.forEach(method -> {
-            var returnType = method.getReturnType();
-            classesToImport.add(returnType.getFullClassName());
-            classesToImport.addAll(method.getParameters().values().stream().map(ClassType::getFullClassName).collect(
-                toList()));
+            if ((method.getReturnType() != null) && (method.getReturnType() instanceof ClassType)) {
+                ClassType returnClassType = (ClassType) method.getReturnType();
+                classesToImport.add(returnClassType.getFullClassName());
+                Optional.ofNullable(returnClassType.getGenerics()).map(Map::values)
+                    .get().stream()
+                    .filter(generic -> generic instanceof ClassType)
+                    .map(ClassType.class::cast)
+                    .forEach(generic -> {
+                        classesToImport.add(generic.getFullClassName());
+                    });
+            }
+            var classesParameters = method.getParameters().values()
+                .stream()
+                .filter(item -> item instanceof ClassType)
+                .map(ClassType.class::cast)
+                .map(ClassType::getFullClassName).collect(
+                    toList());
+            if (!classesParameters.isEmpty()) {
+                classesToImport.addAll(classesParameters);
+            }
 
         });
     }
@@ -63,21 +80,20 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
     protected void doBuildCode() {
         codeLines = new ArrayList<>();
         codeLines.add(getPackageDeclaration());
-        codeLines.add(System.lineSeparator());
         importClassesFromMethods();
         importClasses();
-        var classDeclaration = new StringBuilder();
+        var classDeclaration = new StringBuilder(System.lineSeparator());
         classDeclaration.append(Modifier.currentAccessModifier(modifiers));
         classDeclaration.append(StringUtils.SPACE).append("class").append(StringUtils.SPACE);
         classDeclaration.append(className);
         classDeclaration.append('{');
 
         codeLines.add(classDeclaration.toString());
-        codeLines.add(System.lineSeparator());
 
         codeLines.addAll(createFields());
-
-        codeLines.addAll(createAccessors());
+        if (!fields.isEmpty()) {
+            codeLines.addAll(createAccessors());
+        }
 
         if (methods != null) {
             methods.forEach(method -> codeLines.addAll(method.getSourceLines().stream().map(
@@ -89,9 +105,7 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
     }
 
     private Collection<? extends String> createAccessors() {
-        if (fields.isEmpty()) {
-            return Collections.emptyList();
-        }
+
         List<String> lines = new ArrayList<>();
         fields.forEach(field -> {
             if (field.isSetter()) {
@@ -110,12 +124,11 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
                 lines.add(String.format("%s}%n", getIndentation(1)));
             }
         });
-        lines.add(System.lineSeparator());
         return lines;
     }
 
     @Override
-    public DefinitionBuilderWithMethods addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methods) {
+    public ClassDefinitionBuilder addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methods) {
         this.methods = methods;
         return this;
     }

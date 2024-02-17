@@ -16,25 +16,21 @@
 package com.camucode.gen;
 
 import com.camucode.gen.values.Modifier;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.commons.lang3.ArrayUtils;
-
-import static com.camucode.gen.util.Constants.SEARCH_DOT;
-
-import java.util.Collection;
-import java.util.Collections;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import static com.camucode.gen.util.Constants.SEARCH_DOT;
 import static java.util.stream.Collectors.toList;
-
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author diego.silva@apuntesdejava.com
@@ -49,9 +45,9 @@ public abstract class DefinitionBuilder {
     protected Set<String> classesToImport = new TreeSet<>();
     protected Collection<FieldDefinitionBuilder.FieldDefinition> fields;
 
-    protected int spaceIndent = 2;
+    static int spaceIndent = 4;
 
-    String getIndentation(int level) {
+    static String getIndentation(int level) {
         return StringUtils.repeat(StringUtils.SPACE, spaceIndent * level);
     }
 
@@ -70,7 +66,7 @@ public abstract class DefinitionBuilder {
      * @param packageDefinition The definition of the package to which the class belongs. It should be separated by
      * points, just like a package.
      * @param className The name of the class to create
-     * @return
+     * @return {@link ClassDefinitionBuilder} itself
      */
     public static ClassDefinitionBuilder createClassBuilder(String packageDefinition, String className) {
         return new ClassDefinitionBuilder(packageDefinition, className);
@@ -122,9 +118,7 @@ public abstract class DefinitionBuilder {
             return Collections.emptyList();
         }
         List<String> lines = fields.stream().map(field -> String.format("%s%s%n", getIndentation(1), field.sourceLine))
-            .collect(
-                toList());
-        lines.add(System.lineSeparator());
+            .collect(toList());
         return lines;
     }
 
