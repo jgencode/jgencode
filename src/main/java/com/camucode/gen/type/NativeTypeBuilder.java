@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Diego Silva diego.silva at apuntesdejava.com.
+ * Copyright 2024 Diego Silva <diego.silva at apuntesdejava.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen;
-
-import java.util.Collection;
+package com.camucode.gen.type;
 
 /**
  *
  * @author Diego Silva diego.silva at apuntesdejava.com
  */
-public interface DefinitionBuilderWithMethods {
+public class NativeTypeBuilder {
 
-    /**
-     * Adds a method definition collection to the current class builder
-     *
-     * @param methods A collection of method definitions. See
-     * #{@link com.camucode.gen.MethodDefinitionBuilder.MethodDefinition}
-     * @return The current builder instance
-     */
-    DefinitionBuilderWithMethods addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methods);
+    private String name;
+
+    private NativeTypeBuilder() {
+
+    }
+
+    public static NativeTypeBuilder newBuilder() {
+        return new NativeTypeBuilder();
+    }
+
+    public NativeTypeBuilder name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    public NativeType build() {
+        return new NativeType(name);
+    }
+
 }

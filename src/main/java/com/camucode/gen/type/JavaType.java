@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Diego Silva diego.silva at apuntesdejava.com.
+ * Copyright 2024 Diego Silva <diego.silva at apuntesdejava.com>.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen;
-
-import java.util.Collection;
+package com.camucode.gen.type;
 
 /**
  *
  * @author Diego Silva diego.silva at apuntesdejava.com
  */
-public interface DefinitionBuilderWithMethods {
+public abstract class JavaType {
+    
+     private String name;
 
     /**
-     * Adds a method definition collection to the current class builder
+     * Get the value of name
      *
-     * @param methods A collection of method definitions. See
-     * #{@link com.camucode.gen.MethodDefinitionBuilder.MethodDefinition}
-     * @return The current builder instance
+     * @return the value of name
      */
-    DefinitionBuilderWithMethods addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methods);
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Set the value of name
+     *
+     * @param name new value of name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+    public JavaType(String name) {
+        this.name = name;
+    }
+    
+    public abstract String getFullName();
+
 }

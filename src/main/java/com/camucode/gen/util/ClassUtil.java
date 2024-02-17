@@ -13,22 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen;
+package com.camucode.gen.util;
 
-import java.util.Collection;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
  * @author Diego Silva diego.silva at apuntesdejava.com
  */
-public interface DefinitionBuilderWithMethods {
+public class ClassUtil {
 
-    /**
-     * Adds a method definition collection to the current class builder
-     *
-     * @param methods A collection of method definitions. See
-     * #{@link com.camucode.gen.MethodDefinitionBuilder.MethodDefinition}
-     * @return The current builder instance
-     */
-    DefinitionBuilderWithMethods addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methods);
+    public static String removeClassFromPackage(String packageName, String className) {
+        return StringUtils.substringBefore(packageName, "." + className);
+    }
+    
 }

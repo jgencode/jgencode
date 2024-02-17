@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Diego Silva <diego.silva at apuntesdejava.com>.
+ * Copyright 2024 Diego Silva diego.silva at apuntesdejava.com.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.camucode.gen;
 
 import com.camucode.gen.type.ClassType;
+import com.camucode.gen.type.JavaType;
 import com.camucode.gen.values.Modifier;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ import static com.camucode.gen.util.Constants.MORE_THAN;
 import static java.util.stream.Collectors.toList;
 
 /**
- * @author Diego Silva <diego.silva at apuntesdejava.com>
+ * @author Diego Silva diego.silva at apuntesdejava.com
  */
 public class InterfaceDefinitionBuilder extends DefinitionBuilder implements DefinitionBuilderWithMethods {
 
@@ -58,7 +59,7 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
         codeLines = new ArrayList<>();
         codeLines.add(getPackageDeclaration());
 
-        var classDeclaration = new StringBuilder(System.lineSeparator());
+        var classDeclaration = new StringBuilder();
         classDeclaration.append(Modifier.currentAccessModifier(modifiers));
         classDeclaration.append(StringUtils.SPACE).append("interface").append(StringUtils.SPACE);
         classDeclaration.append(className);
@@ -86,8 +87,8 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
         }
         methods.forEach(method -> {
             var returnType = method.getReturnType();
-            classesToImport.add(returnType.getFullClassName());
-            classesToImport.addAll(method.getParameters().values().stream().map(ClassType::getFullClassName).collect(
+            classesToImport.add(returnType.getFullName());
+            classesToImport.addAll(method.getParameters().values().stream().map(JavaType::getFullName).collect(
                 toList()));
 
         });
@@ -100,18 +101,18 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
                 declaration.append(LESS_THAN);
                 var params
                     = interfaceExtend.getGenerics().values().stream().map(genericType -> {
-                        if (genericType instanceof ClassType) {
-                            var genericTypeParam = (ClassType) genericType;
-                            var classToImport = genericTypeParam.getFullClassName();
-                            classesToImport.add(classToImport);
-                            return genericTypeParam.getClassName();
-                        }
-                        if (GENERAL_CLASSES.containsKey((String) genericType)) {
-                            classesToImport.add(GENERAL_CLASSES.get((String) genericType));
-                        }
-                        return (String) genericType;
+                    if (genericType instanceof ClassType) {
+                        var genericTypeParam = (ClassType) genericType;
+                        var classToImport = genericTypeParam.getFullClassName();
+                        classesToImport.add(classToImport);
+                        return genericTypeParam.getClassName();
+                    }
+                    if (GENERAL_CLASSES.containsKey((String) genericType)) {
+                        classesToImport.add(GENERAL_CLASSES.get((String) genericType));
+                    }
+                    return (String) genericType;
 
-                    }).collect(Collectors.joining(COMMA_SPACE));
+                }).collect(Collectors.joining(COMMA_SPACE));
                 declaration.append(params);
                 declaration.append(MORE_THAN);
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Diego Silva <diego.silva at apuntesdejava.com>.
+ * Copyright 2023 Diego Silva diego.silva at apuntesdejava.com.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,27 +15,28 @@
  */
 package com.camucode.gen.type;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import static com.camucode.gen.util.Constants.COMMA;
 import static com.camucode.gen.util.Constants.LESS_THAN;
 import static com.camucode.gen.util.Constants.MORE_THAN;
-import java.util.Map;
-import static java.util.stream.Collectors.toList;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * @author Diego Silva <diego.silva at apuntesdejava.com>
+ * @author Diego Silva diego.silva at apuntesdejava.com
  */
-public class ClassType {
+public class ClassType extends JavaType{
 
     private final String packageName;
-    private final String className;
     private final String classNameNoGeneric;
     Map<String, Object> generics;
 
     ClassType(String packageName, String className) {
+        super(className);
         this.packageName = packageName;
-        this.className = className;
         this.classNameNoGeneric = StringUtils.substringBefore(className, LESS_THAN);
     }
 
@@ -55,21 +56,26 @@ public class ClassType {
     }
 
     public String getClassName() {
-        return className;
+        return super.getName();
     }
 
     public String getClassNameWithGeneric() {
         if (generics == null) {
-            return className;
+            return super.getName();
         }
-        return String.format("%s%s%s%s", className, LESS_THAN, String.join(COMMA, generics.values().stream().map(
+        return String.format("%s%s%s%s", super.getName(), LESS_THAN, generics.values().stream().map(
             type -> type instanceof ClassType ? ((ClassType) type).getClassNameWithGeneric() : (String) type).collect(
-                toList())),
+                Collectors.joining(COMMA)),
             MORE_THAN);
     }
 
     public Map<String, Object> getGenerics() {
         return generics;
+    }
+
+    @Override
+    public String getFullName() {
+        return getClassNameWithGeneric();
     }
 
 }
