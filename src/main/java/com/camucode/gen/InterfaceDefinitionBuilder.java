@@ -16,7 +16,6 @@
 package com.camucode.gen;
 
 import com.camucode.gen.type.ClassType;
-import com.camucode.gen.type.JavaType;
 import com.camucode.gen.values.Modifier;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -66,7 +65,7 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
         addInterfacesExtendsCode(classDeclaration);
         classDeclaration.append('{');
 
-        importClassesFromMethods();
+        MethodUtil.importClassesFromMethods(methods, classesToImport);
 
         importClasses();
         codeLines.add(classDeclaration.toString());
@@ -80,19 +79,6 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
         codeLines.add("}");
     }
 
-    private void importClassesFromMethods() {
-        LOGGER.debug("getting the classes that are used in the methods");
-        if (methods == null) {
-            return;
-        }
-        methods.forEach(method -> {
-            var returnType = method.getReturnType();
-            classesToImport.add(returnType.getFullName());
-            classesToImport.addAll(method.getParameters().values().stream().map(JavaType::getFullName).collect(
-                toList()));
-
-        });
-    }
 
     private void addInterfacesExtendsCode(StringBuilder classDeclaration) {
         var interfacesExtendsCode = interfacesExtends.stream().map(interfaceExtend -> {

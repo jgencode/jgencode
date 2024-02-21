@@ -15,7 +15,6 @@
  */
 package com.camucode.gen;
 
-import com.camucode.gen.type.ClassType;
 import com.camucode.gen.values.Modifier;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -24,8 +23,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 
@@ -42,36 +39,6 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
         super(packageDefinition, className);
     }
 
-    private void importClassesFromMethods() {
-        LOGGER.debug("getting the classes that are used in the methods");
-        if (methods == null) {
-            return;
-        }
-        methods.forEach(method -> {
-            if ((method.getReturnType() != null) && (method.getReturnType() instanceof ClassType)) {
-                ClassType returnClassType = (ClassType) method.getReturnType();
-                classesToImport.add(returnClassType.getFullClassName());
-                Optional.ofNullable(returnClassType.getGenerics()).map(Map::values)
-                    .get().stream()
-                    .filter(generic -> generic instanceof ClassType)
-                    .map(ClassType.class::cast)
-                    .forEach(generic -> {
-                        classesToImport.add(generic.getFullClassName());
-                    });
-            }
-            var classesParameters = method.getParameters().values()
-                .stream()
-                .filter(item -> item instanceof ClassType)
-                .map(ClassType.class::cast)
-                .map(ClassType::getFullClassName).collect(
-                    toList());
-            if (!classesParameters.isEmpty()) {
-                classesToImport.addAll(classesParameters);
-            }
-
-        });
-    }
-
     /**
      * Builds the code according to the values assigned in its properties. The result is saved in {@link #codeLines}
      * internal property
@@ -80,7 +47,7 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
     protected void doBuildCode() {
         codeLines = new ArrayList<>();
         codeLines.add(getPackageDeclaration());
-        importClassesFromMethods();
+        MethodUtil.importClassesFromMethods(methods, classesToImport);
         importClasses();
         var classDeclaration = new StringBuilder(System.lineSeparator());
         classDeclaration.append(Modifier.currentAccessModifier(modifiers));
@@ -91,7 +58,8 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
         codeLines.add(classDeclaration.toString());
 
         codeLines.addAll(createFields());
-        if (!fields.isEmpty()) {
+
+        if (fields != null && !fields.isEmpty()) {
             codeLines.addAll(createAccessors());
         }
 
