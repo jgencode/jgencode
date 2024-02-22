@@ -15,6 +15,7 @@
  */
 package com.camucode.gen;
 
+import com.camucode.gen.type.AnnotationType;
 import com.camucode.gen.values.Modifier;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -44,10 +46,10 @@ public abstract class DefinitionBuilder {
     protected List<String> codeLines;
     protected Set<String> classesToImport = new TreeSet<>();
     protected Collection<FieldDefinitionBuilder.FieldDefinition> fields;
-
+    protected Set<AnnotationType> annotationTypes = new LinkedHashSet<>();
     static int spaceIndent = 4;
 
-    static String getIndentation(int level) {
+    public static String getIndentation(int level) {
         return StringUtils.repeat(StringUtils.SPACE, spaceIndent * level);
     }
 
@@ -64,8 +66,8 @@ public abstract class DefinitionBuilder {
      * Create a builder for the definition of a class.
      *
      * @param packageDefinition The definition of the package to which the class belongs. It should be separated by
-     * points, just like a package.
-     * @param className The name of the class to create
+     *                          points, just like a package.
+     * @param className         The name of the class to create
      * @return {@link ClassDefinitionBuilder} itself
      */
     public static ClassDefinitionBuilder createClassBuilder(String packageDefinition, String className) {
@@ -74,6 +76,18 @@ public abstract class DefinitionBuilder {
 
     public static InterfaceDefinitionBuilder createInterfaceBuilder(String packageDefinition, String interfaceName) {
         return new InterfaceDefinitionBuilder(packageDefinition, interfaceName);
+    }
+
+    public DefinitionBuilder addAnnotationType(AnnotationType annotationType) {
+        this.annotationTypes.add(annotationType);
+        return this;
+    }
+
+    public DefinitionBuilder addField(FieldDefinitionBuilder.FieldDefinition fieldDefinition) {
+        Optional.ofNullable(fields).orElseGet(() -> {
+            return this.fields = new LinkedHashSet<>();
+        }).add(fieldDefinition);
+        return this;
     }
 
     public String getPackageDefinition() {
@@ -109,7 +123,9 @@ public abstract class DefinitionBuilder {
     }
 
     public DefinitionBuilder addFields(Collection<FieldDefinitionBuilder.FieldDefinition> fieldsDefinition) {
-        this.fields = fieldsDefinition;
+        Optional.ofNullable(fields).orElseGet(() -> {
+            return this.fields = new LinkedHashSet<>();
+        }).addAll( fieldsDefinition);
         return this;
     }
 
@@ -117,9 +133,9 @@ public abstract class DefinitionBuilder {
         if (fields == null || fields.isEmpty()) {
             return Collections.emptyList();
         }
-        List<String> lines = fields.stream().map(field -> String.format("%s%s%n", getIndentation(1), field.sourceLine))
+        return fields.stream().flatMap(field -> field.sourceLines.stream())
+            .map(line -> String.format("%s%s", getIndentation(1), line))
             .collect(toList());
-        return lines;
     }
 
     protected void importClasses() {
@@ -127,11 +143,21 @@ public abstract class DefinitionBuilder {
         //from fields
         if (fields != null) {
             classesToImport.addAll(fields.stream().filter(
-                field -> field.getClassType() != null && StringUtils.isNotBlank(
-                field.getClassType().getPackageName())).map(field -> field.getClassType().getFullClassName())
+                    field -> field.getClassType() != null && StringUtils.isNotBlank(
+                        field.getClassType().getPackageName())).map(field -> field.getClassType().getFullClassName())
                 .filter(
                     StringUtils::isNotBlank).collect(Collectors.toSet()));
+            //from annotation
+            classesToImport.addAll(
+                fields.stream().flatMap(field -> field.getAnnotationType().stream())
+                    .map(annotationType -> annotationType.getClassType().getFullClassName())
+                    .collect(toList()));
         }
+        //from class annotations
+        annotationTypes.forEach(annotationType -> classesToImport.add(annotationType.getClassType()
+            .getFullClassName()));
+
+
         classesToImport.forEach(classToImport -> codeLines.add(String.format("import %s;", classToImport)));
     }
 
