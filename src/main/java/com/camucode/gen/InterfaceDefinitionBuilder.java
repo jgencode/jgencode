@@ -16,6 +16,7 @@
 package com.camucode.gen;
 
 import com.camucode.gen.type.ClassType;
+import com.camucode.gen.util.MethodUtil;
 import com.camucode.gen.values.Modifier;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -59,6 +60,11 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
         codeLines.add(getPackageDeclaration());
 
         var classDeclaration = new StringBuilder();
+        annotationTypes.forEach(annotationType -> {
+            for (String s : annotationType.createSourceLines()) {
+                classDeclaration.append(s).append(System.lineSeparator());
+            }
+        });
         classDeclaration.append(Modifier.currentAccessModifier(modifiers));
         classDeclaration.append(StringUtils.SPACE).append("interface").append(StringUtils.SPACE);
         classDeclaration.append(className);

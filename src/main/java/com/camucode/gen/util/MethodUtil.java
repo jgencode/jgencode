@@ -1,5 +1,6 @@
-package com.camucode.gen;
+package com.camucode.gen.util;
 
+import com.camucode.gen.MethodDefinitionBuilder;
 import com.camucode.gen.type.ClassType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ import static java.util.stream.Collectors.toList;
 public class MethodUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodUtil.class);
 
-    static void importClassesFromMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methods,
+  public  static void importClassesFromMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methods,
                                          Set<String> classesToImport) {
      LOGGER.debug("getting the classes that are used in the methods");
         if (methods == null) {

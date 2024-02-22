@@ -15,15 +15,20 @@
  */
 package com.camucode.gen;
 
+import com.camucode.gen.type.AnnotationType;
 import com.camucode.gen.type.ClassType;
 import com.camucode.gen.values.Modifier;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.camucode.gen.util.Constants.SEMI_COLON;
-import java.util.Optional;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 
 /**
  * @author Diego Silva diego.silva at apuntesdejava.com
@@ -36,6 +41,8 @@ public class FieldDefinitionBuilder {
 
     private String fieldName;
     private String nativeType;
+
+    private final Set<AnnotationType> annotationTypes = new LinkedHashSet<>();
     private ClassType classType;
     private final Set<Modifier> modifiers = new LinkedHashSet<>();
     private boolean setter;
@@ -65,6 +72,11 @@ public class FieldDefinitionBuilder {
         return this;
     }
 
+    public FieldDefinitionBuilder addAnnotationType(AnnotationType annotationType) {
+        this.annotationTypes.add(annotationType);
+        return this;
+    }
+
     public FieldDefinitionBuilder setter(boolean setter) {
         this.setter = setter;
         return this;
@@ -83,42 +95,53 @@ public class FieldDefinitionBuilder {
         fieldDefinition.modifiers = modifiers;
         fieldDefinition.nativeType = nativeType;
         fieldDefinition.setter = setter;
-        fieldDefinition.sourceLine = createSourceLine();
+        fieldDefinition.annotationType = annotationTypes;
+        fieldDefinition.sourceLines = createSourceLine();
         return fieldDefinition;
     }
 
 
-    private String createSourceLine() {
+    private List<String> createSourceLine() {
+        List<String> lines = new ArrayList<>();
+        annotationTypes.forEach(annotationType -> lines.addAll(annotationType.createSourceLines()));
+
         var sourceLine = new StringBuilder();
         sourceLine.append(Modifier.currentAccessModifier(modifiers))
-            .append(StringUtils.SPACE);
+            .append(SPACE);
         if (StringUtils.isBlank(nativeType)) {
             sourceLine.append(classType.getClassName());
         } else {
             sourceLine.append(nativeType);
         }
-        sourceLine.append(StringUtils.SPACE);
+        sourceLine.append(SPACE);
         sourceLine.append(fieldName);
         sourceLine.append(SEMI_COLON);
-        return sourceLine.toString();
+        lines.add(sourceLine.toString());
+        lines.add(EMPTY);
+        return lines;
     }
 
     public static class FieldDefinition {
 
+        public Set<AnnotationType> annotationType;
         private String fieldName;
         private String nativeType;
         private ClassType classType;
         private Set<Modifier> modifiers = new LinkedHashSet<>();
         private boolean setter;
         private boolean getter;
-        String sourceLine;
+        List<String> sourceLines;
 
         public String getFieldName() {
             return fieldName;
         }
-        
-        public String getFieldType(){
+
+        public String getFieldType() {
             return Optional.ofNullable(classType).map(ClassType::getClassName).orElse(nativeType);
+        }
+
+        public Set<AnnotationType> getAnnotationType() {
+            return annotationType;
         }
 
         public String getNativeType() {
@@ -141,8 +164,8 @@ public class FieldDefinitionBuilder {
             return getter;
         }
 
-        public String getSourceLine() {
-            return sourceLine;
+        public List<String> getSourceLines() {
+            return sourceLines;
         }
 
         private FieldDefinition() {

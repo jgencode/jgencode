@@ -15,6 +15,9 @@
  */
 package com.camucode.gen;
 
+import com.camucode.gen.type.ClassType;
+import com.camucode.gen.util.Constants;
+import com.camucode.gen.util.MethodUtil;
 import com.camucode.gen.values.Modifier;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -22,9 +25,12 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 
 /**
  * @author diego.silva
@@ -35,8 +41,18 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
 
     private Collection<MethodDefinitionBuilder.MethodDefinition> methods;
 
+    private final Collection<ClassType> interfacesImplements = new LinkedHashSet<>();
+
     ClassDefinitionBuilder(String packageDefinition, String className) {
         super(packageDefinition, className);
+    }
+
+    @Override
+    protected void importClasses() {
+        //from interfaces
+        interfacesImplements.forEach(interfaceImplement -> classesToImport.add(interfaceImplement.getFullClassName()));
+
+        super.importClasses();
     }
 
     /**
@@ -50,9 +66,16 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
         MethodUtil.importClassesFromMethods(methods, classesToImport);
         importClasses();
         var classDeclaration = new StringBuilder(System.lineSeparator());
+        annotationTypes.forEach(annotationType -> {
+            for (String s : annotationType.createSourceLines()) {
+                classDeclaration.append(s).append(System.lineSeparator());
+            }
+        });
+
         classDeclaration.append(Modifier.currentAccessModifier(modifiers));
-        classDeclaration.append(StringUtils.SPACE).append("class").append(StringUtils.SPACE);
+        classDeclaration.append(SPACE).append("class").append(SPACE);
         classDeclaration.append(className);
+        addInterfaceImplementsToDeclaration(classDeclaration);
         classDeclaration.append('{');
 
         codeLines.add(classDeclaration.toString());
@@ -71,6 +94,23 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
 
         codeLines.add("}");
     }
+
+    private void addInterfaceImplementsToDeclaration(StringBuilder classDeclaration) {
+        if (interfacesImplements.isEmpty()) return;
+        classDeclaration.append(" implements ");
+
+        var interfaces =
+            interfacesImplements.stream().map(ClassType::getClassName)
+                .collect(Collectors.joining(Constants.COMMA_SPACE));
+        classDeclaration.append(interfaces);
+        classDeclaration.append(SPACE);
+    }
+
+    public ClassDefinitionBuilder addInterfaceImplements(ClassType interfaceType) {
+        interfacesImplements.add(interfaceType);
+        return this;
+    }
+
 
     private Collection<? extends String> createAccessors() {
 
