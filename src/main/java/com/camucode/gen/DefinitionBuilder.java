@@ -84,9 +84,7 @@ public abstract class DefinitionBuilder {
     }
 
     public DefinitionBuilder addField(FieldDefinitionBuilder.FieldDefinition fieldDefinition) {
-        Optional.ofNullable(fields).orElseGet(() -> {
-            return this.fields = new LinkedHashSet<>();
-        }).add(fieldDefinition);
+        Optional.ofNullable(fields).orElseGet(() -> this.fields = new LinkedHashSet<>()).add(fieldDefinition);
         return this;
     }
 
@@ -123,9 +121,7 @@ public abstract class DefinitionBuilder {
     }
 
     public DefinitionBuilder addFields(Collection<FieldDefinitionBuilder.FieldDefinition> fieldsDefinition) {
-        Optional.ofNullable(fields).orElseGet(() -> {
-            return this.fields = new LinkedHashSet<>();
-        }).addAll( fieldsDefinition);
+        Optional.ofNullable(fields).orElseGet(() -> this.fields = new LinkedHashSet<>()).addAll(fieldsDefinition);
         return this;
     }
 

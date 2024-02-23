@@ -48,6 +48,8 @@ public class FieldDefinitionBuilder {
     private boolean setter;
     private boolean getter;
 
+    private String defaultValue;
+
     private FieldDefinitionBuilder() {
 
     }
@@ -87,6 +89,11 @@ public class FieldDefinitionBuilder {
         return this;
     }
 
+    public FieldDefinitionBuilder defaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+        return this;
+    }
+
     public FieldDefinition build() {
         FieldDefinition fieldDefinition = new FieldDefinition();
         fieldDefinition.classType = classType;
@@ -96,6 +103,7 @@ public class FieldDefinitionBuilder {
         fieldDefinition.nativeType = nativeType;
         fieldDefinition.setter = setter;
         fieldDefinition.annotationType = annotationTypes;
+        fieldDefinition.defaultValue = defaultValue;
         fieldDefinition.sourceLines = createSourceLine();
         return fieldDefinition;
     }
@@ -115,6 +123,10 @@ public class FieldDefinitionBuilder {
         }
         sourceLine.append(SPACE);
         sourceLine.append(fieldName);
+        if (StringUtils.isNotBlank(defaultValue)) {
+            sourceLine.append(" = ");
+            sourceLine.append(defaultValue);
+        }
         sourceLine.append(SEMI_COLON);
         lines.add(sourceLine.toString());
         lines.add(EMPTY);
@@ -124,6 +136,7 @@ public class FieldDefinitionBuilder {
     public static class FieldDefinition {
 
         public Set<AnnotationType> annotationType;
+        public String defaultValue;
         private String fieldName;
         private String nativeType;
         private ClassType classType;

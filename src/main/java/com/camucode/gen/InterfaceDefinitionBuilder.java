@@ -24,8 +24,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.camucode.gen.util.Constants.COMMA;
@@ -75,6 +77,7 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
 
         importClasses();
         codeLines.add(classDeclaration.toString());
+        codeLines.addAll(createFields());
 
         if (methods != null) {
             methods.forEach(method -> codeLines.addAll(method.getSourceLines().stream().map(
@@ -116,8 +119,14 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
     }
 
     @Override
-    public DefinitionBuilderWithMethods addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methods) {
-        this.methods = methods;
+    public DefinitionBuilderWithMethods addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methodDefinitions) {
+        Optional.ofNullable(this.methods).orElseGet(() -> this.methods = new LinkedHashSet<>()).addAll(methodDefinitions);
+        return this;
+    }
+
+    @Override
+    public DefinitionBuilderWithMethods addMethod(MethodDefinitionBuilder.MethodDefinition methodDefinition) {
+        Optional.ofNullable(this.methods).orElseGet(() -> this.methods = new LinkedHashSet<>()).add(methodDefinition);
         return this;
     }
 

@@ -31,4 +31,5 @@ public interface DefinitionBuilderWithMethods {
      * @return The current builder instance
      */
     DefinitionBuilderWithMethods addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methods);
+    DefinitionBuilderWithMethods addMethod(MethodDefinitionBuilder.MethodDefinition methodDefinition);
 }

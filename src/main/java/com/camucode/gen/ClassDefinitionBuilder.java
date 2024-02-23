@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -136,8 +137,15 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
     }
 
     @Override
-    public ClassDefinitionBuilder addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methods) {
-        this.methods = methods;
+    public ClassDefinitionBuilder addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methodDefinitions) {
+        Optional.ofNullable(this.methods).orElseGet(() -> this.methods = new LinkedHashSet<>())
+            .addAll(methodDefinitions);
+        return this;
+    }
+
+    @Override
+    public DefinitionBuilderWithMethods addMethod(MethodDefinitionBuilder.MethodDefinition methodDefinition) {
+        Optional.ofNullable(this.methods).orElseGet(() -> this.methods = new LinkedHashSet<>()).add(methodDefinition);
         return this;
     }
 
