@@ -44,6 +44,8 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
 
     private final Collection<ClassType> interfacesImplements = new LinkedHashSet<>();
 
+    private ClassType classExtended;
+
     ClassDefinitionBuilder(String packageDefinition, String className) {
         super(packageDefinition, className);
     }
@@ -52,6 +54,10 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
     protected void importClasses() {
         //from interfaces
         interfacesImplements.forEach(interfaceImplement -> classesToImport.add(interfaceImplement.getFullClassName()));
+        //from extended
+        if (classExtended != null) {
+            classesToImport.add(classExtended.getFullClassName());
+        }
 
         super.importClasses();
     }
@@ -76,6 +82,7 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
         classDeclaration.append(Modifier.currentAccessModifier(modifiers));
         classDeclaration.append(SPACE).append("class").append(SPACE);
         classDeclaration.append(className);
+        addClassExtendedToDeclaration(classDeclaration);
         addInterfaceImplementsToDeclaration(classDeclaration);
         classDeclaration.append('{');
 
@@ -96,6 +103,13 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
         codeLines.add("}");
     }
 
+    private void addClassExtendedToDeclaration(StringBuilder classDeclaration) {
+        if (classExtended == null) return;
+        classDeclaration.append(" extends ")
+            .append(classExtended.getClassName())
+            .append(SPACE);
+    }
+
     private void addInterfaceImplementsToDeclaration(StringBuilder classDeclaration) {
         if (interfacesImplements.isEmpty()) return;
         classDeclaration.append(" implements ");
@@ -109,6 +123,11 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
 
     public ClassDefinitionBuilder addInterfaceImplements(ClassType interfaceType) {
         interfacesImplements.add(interfaceType);
+        return this;
+    }
+
+    public ClassDefinitionBuilder classExtended(ClassType classExtended) {
+        this.classExtended = classExtended;
         return this;
     }
 
