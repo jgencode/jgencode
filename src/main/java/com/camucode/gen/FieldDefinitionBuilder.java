@@ -108,7 +108,6 @@ public class FieldDefinitionBuilder {
         return fieldDefinition;
     }
 
-
     private List<String> createSourceLine() {
         List<String> lines = new ArrayList<>();
         annotationTypes.forEach(annotationType -> lines.addAll(annotationType.createSourceLines()));

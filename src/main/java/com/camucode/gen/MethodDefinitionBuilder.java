@@ -35,6 +35,7 @@ import static com.camucode.gen.util.Constants.CLOSE_BRACE;
 import static com.camucode.gen.util.Constants.COMMA;
 import static com.camucode.gen.util.Constants.OPEN_BRACE;
 import static com.camucode.gen.util.Constants.SEMI_COLON;
+import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
 /**
@@ -155,7 +156,7 @@ public class MethodDefinitionBuilder {
         }
         sourceString.append(parameters.stream().map(parameter -> String.format("%s %s %s",
             parameter.getAnnotationSource(),
-            parameter.getParameterType().getFullName(),
+            parameter.getParameterType() == null ? EMPTY : parameter.getParameterType().getFullName(),
             parameter.getParameterName()
         )).collect(Collectors.joining(COMMA)));
     }

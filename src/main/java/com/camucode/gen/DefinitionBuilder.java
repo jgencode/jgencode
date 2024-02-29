@@ -74,6 +74,9 @@ public abstract class DefinitionBuilder {
         return new ClassDefinitionBuilder(packageDefinition, className);
     }
 
+    public static RecordDefinitionBuilder createRecordBuilder(String packageDefinition, String className) {
+        return new RecordDefinitionBuilder(packageDefinition, className);
+    }
     public static InterfaceDefinitionBuilder createInterfaceBuilder(String packageDefinition, String interfaceName) {
         return new InterfaceDefinitionBuilder(packageDefinition, interfaceName);
     }
