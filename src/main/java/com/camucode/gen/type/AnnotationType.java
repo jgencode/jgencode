@@ -27,7 +27,7 @@ import static com.camucode.gen.util.Constants.COMMA;
 /**
  * @author Diego Silva diego.silva at apuntesdejava.com
  */
-public class AnnotationType {
+public class AnnotationType   {
 
     ClassType classType;
     Map<String, Object> attributes;
@@ -46,8 +46,9 @@ public class AnnotationType {
     public List<String> createSourceLines() {
         List<String> lines = new ArrayList<>();
         String annotation = "@" + classType.getClassName();
-        if (attributes.isEmpty()) lines.add(annotation);
-        else {
+        if (attributes.isEmpty()) {
+            lines.add(annotation);
+        } else {
             lines.add(annotation + "(");
             attributes.forEach((key, value) -> {
                 Object toValue = (value instanceof String) ? (String.format("\"%s\"", value)) : value;
@@ -60,5 +61,6 @@ public class AnnotationType {
         }
         return lines;
     }
+
 
 }

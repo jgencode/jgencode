@@ -1,13 +1,15 @@
 package com.camucode.gen.util;
 
 import com.camucode.gen.MethodDefinitionBuilder;
+import com.camucode.gen.ParameterDefinition;
+import com.camucode.gen.type.AnnotationType;
 import com.camucode.gen.type.ClassType;
+import com.camucode.gen.type.JavaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -28,19 +30,18 @@ public class MethodUtil {
                 classesToImport.add(returnClassType.getFullClassName());
                 if (returnClassType.getGenerics() != null)
                     Optional.ofNullable(returnClassType.getGenerics()).map(Map::values)
-                        .filter(Objects::nonNull)
                         .get().stream()
                         .filter(generic -> generic instanceof ClassType)
                         .map(ClassType.class::cast)
-                        .forEach(generic -> {
-                            classesToImport.add(generic.getFullClassName());
-                        });
+                        .forEach(generic -> classesToImport.add(generic.getFullClassName()));
             }
-            var classesParameters = method.getParameters().values()
+            method.annotationTypes.stream().map(AnnotationType::getClassType)
+                .forEach(classType -> classesToImport.add(classType.getFullClassName()));
+
+            var classesParameters = method.getParameters()
                 .stream()
-                .filter(item -> item instanceof ClassType)
-                .map(ClassType.class::cast)
-                .map(ClassType::getFullClassName).collect(
+                .map(ParameterDefinition::getParameterType)
+                .map(JavaType::getFullName).collect(
                     toList());
             if (!classesParameters.isEmpty()) {
                 classesToImport.addAll(classesParameters);

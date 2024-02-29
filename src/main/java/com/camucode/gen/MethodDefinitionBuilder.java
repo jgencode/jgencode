@@ -15,25 +15,26 @@
  */
 package com.camucode.gen;
 
-import static com.camucode.gen.DefinitionBuilder.getIndentation;
+import com.camucode.gen.type.AnnotationType;
 import com.camucode.gen.type.JavaType;
-import static com.camucode.gen.util.Constants.CLOSE_BRACE;
 import com.camucode.gen.values.Modifier;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.camucode.gen.DefinitionBuilder.getIndentation;
+import static com.camucode.gen.util.Constants.CLOSE_BRACE;
 import static com.camucode.gen.util.Constants.COMMA;
 import static com.camucode.gen.util.Constants.OPEN_BRACE;
 import static com.camucode.gen.util.Constants.SEMI_COLON;
-import org.apache.commons.lang3.StringUtils;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
 /**
@@ -47,7 +48,8 @@ public class MethodDefinitionBuilder {
 
     private JavaType returnType;
     private final Set<Modifier> modifiers = new LinkedHashSet<>();
-    private final Map<String, JavaType> parameters = new LinkedHashMap<>();
+    private final Set<ParameterDefinition> parameters = new LinkedHashSet<>();
+    public Set<AnnotationType> annotationTypes = new LinkedHashSet<>();
 
     private String body;
 
@@ -86,8 +88,13 @@ public class MethodDefinitionBuilder {
         return this;
     }
 
-    public MethodDefinitionBuilder addParameter(String name, JavaType typeDefinition) {
-        parameters.put(name, typeDefinition);
+    public MethodDefinitionBuilder addParameter(ParameterDefinition parameterDefinition) {
+        parameters.add(parameterDefinition);
+        return this;
+    }
+
+    public MethodDefinitionBuilder parameters(Collection<ParameterDefinition> parameterDefinitions) {
+        this.parameters.addAll(parameterDefinitions);
         return this;
     }
 
@@ -99,12 +106,17 @@ public class MethodDefinitionBuilder {
         methodDefinition.modifiers = modifiers;
         methodDefinition.parameters = parameters;
         methodDefinition.body = body;
+        methodDefinition.annotationTypes = annotationTypes;
         methodDefinition.sourceLines = createSourceLines();
 
         return methodDefinition;
     }
 
     private List<String> createSourceLines() {
+        List<String> lines = new ArrayList<>();
+
+        annotationTypes.forEach(annotationType -> lines.addAll(annotationType.createSourceLines()));
+
         StringBuilder sourceString = new StringBuilder();
         sourceString.append(Modifier.currentMethodAccessModifier(modifiers));
         if (sourceString.length() > 0) {
@@ -132,24 +144,34 @@ public class MethodDefinitionBuilder {
             sourceString.append(CLOSE_BRACE).append(System.lineSeparator()).append(System.lineSeparator());
         }
 
-        return sourceString.toString().lines().collect(Collectors.toList());
+        lines.addAll(sourceString.toString().lines().collect(Collectors.toList()));
+
+        return lines;
     }
 
     private void insertParameters(StringBuilder sourceString) {
         if (parameters.isEmpty()) {
             return;
         }
-        sourceString.append(parameters.entrySet().stream().map(parameter -> String.format("%s %s",
-            parameter.getValue().getFullName(),
-            parameter.getKey())).collect(Collectors.joining(COMMA)));
+        sourceString.append(parameters.stream().map(parameter -> String.format("%s %s %s",
+            parameter.getAnnotationSource(),
+            parameter.getParameterType().getFullName(),
+            parameter.getParameterName()
+        )).collect(Collectors.joining(COMMA)));
+    }
+
+    public MethodDefinitionBuilder addAnnotationType(AnnotationType annotationType) {
+        this.annotationTypes.add(annotationType);
+        return this;
     }
 
     public static class MethodDefinition {
 
+        public Set<AnnotationType> annotationTypes;
         private String name;
         private JavaType returnType;
         private Set<Modifier> modifiers;
-        private Map<String, JavaType> parameters;
+        private Set<ParameterDefinition> parameters;
         private List<String> sourceLines;
         private String body;
 
@@ -165,7 +187,7 @@ public class MethodDefinitionBuilder {
             return modifiers;
         }
 
-        public Map<String, JavaType> getParameters() {
+        public Set<ParameterDefinition> getParameters() {
             return parameters;
         }
 
