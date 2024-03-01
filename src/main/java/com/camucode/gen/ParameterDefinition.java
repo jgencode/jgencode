@@ -58,9 +58,8 @@ public class ParameterDefinition {
 
     public String getAnnotationSource() {
         StringBuilder source = new StringBuilder();
-        annotationTypes.forEach(annotationType -> {
-            source.append(String.join(SPACE, annotationType.createSourceLines()));
-        });
+        annotationTypes.forEach(annotationType -> source.append(String.join(SPACE,
+            annotationType.createSourceLines())));
         return source.toString();
     }
 }

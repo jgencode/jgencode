@@ -26,5 +26,18 @@ public class ClassUtil {
     public static String removeClassFromPackage(String packageName, String className) {
         return StringUtils.substringBefore(packageName, "." + className);
     }
-    
+
+    public static boolean isNative(String className) {
+        try {
+            Class.forName("java.lang." + className);
+        } catch (ClassNotFoundException ex) {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isNotNative(String className){
+        return !isNative(className);
+    }
+
 }

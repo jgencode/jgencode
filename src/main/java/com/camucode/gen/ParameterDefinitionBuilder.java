@@ -18,7 +18,9 @@ package com.camucode.gen;
 import com.camucode.gen.type.AnnotationType;
 import com.camucode.gen.type.JavaType;
 import java.util.LinkedHashSet;
+import java.util.Objects;
 import java.util.Set;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 
 /**
  *
@@ -42,7 +44,7 @@ public class ParameterDefinitionBuilder {
     }
 
     public ParameterDefinitionBuilder parameterType(JavaType parameterType) {
-        this.parameterType = this.parameterType;
+        this.parameterType = parameterType;
         return this;
     }
 
@@ -67,9 +69,14 @@ public class ParameterDefinitionBuilder {
     }
 
     private String generateSourceCode() {
-       // throw new UnsupportedOperationException("Not supported yet."); // Generated from
-        // nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-        return "";
+        StringBuilder sourceCode = new StringBuilder();
+        annotationTypes.forEach(annotationType -> {
+            sourceCode.append(String.join(SPACE, annotationType.createSourceLines())).append(SPACE);
+        });
+        if (Objects.nonNull(parameterType)) {
+            sourceCode.append(parameterType.getFullName()).append(SPACE).append(parameterName);
+        }
+        return sourceCode.toString();
     }
 
 }

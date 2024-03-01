@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -154,11 +155,16 @@ public class MethodDefinitionBuilder {
         if (parameters.isEmpty()) {
             return;
         }
-        sourceString.append(parameters.stream().map(parameter -> String.format("%s %s %s",
+        var paramsToInsert = parameters.stream()
+            .filter(parameterDefinition -> Objects.nonNull(parameterDefinition.parameterName))
+            .map(parameter -> String.format("%s %s %s",
             parameter.getAnnotationSource(),
             parameter.getParameterType() == null ? EMPTY : parameter.getParameterType().getFullName(),
             parameter.getParameterName()
-        )).collect(Collectors.joining(COMMA)));
+        )).collect(Collectors.joining(COMMA));
+        if (StringUtils.isNotBlank(paramsToInsert)) {
+            sourceString.append(paramsToInsert);
+        }
     }
 
     public MethodDefinitionBuilder addAnnotationType(AnnotationType annotationType) {

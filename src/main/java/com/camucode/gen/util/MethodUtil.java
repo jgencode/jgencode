@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -41,10 +42,24 @@ public class MethodUtil {
             var classesParameters = method.getParameters()
                 .stream()
                 .map(ParameterDefinition::getParameterType)
-                .map(JavaType::getFullName).collect(
-                    toList());
+                .filter(Objects::nonNull)
+                .map(JavaType::getFullName)
+                .filter(ClassUtil::isNotNative)
+                .collect(toList());
             if (!classesParameters.isEmpty()) {
                 classesToImport.addAll(classesParameters);
+            }
+
+            //from parameters annotations
+
+            var annotationsParameters = method.getParameters()
+                .stream()
+                .flatMap(param -> param.getAnnotationTypes().stream())
+                .map(AnnotationType::getClassType)
+                .map(ClassType::getFullClassName).collect(toList());
+
+            if (!annotationsParameters.isEmpty()) {
+                classesToImport.addAll(annotationsParameters);
             }
 
         });

@@ -52,6 +52,7 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
 
     @Override
     protected void importClasses() {
+        LOGGER.debug("import classes from class definition {}", className);
         //from interfaces
         interfacesImplements.forEach(interfaceImplement -> classesToImport.add(interfaceImplement.getFullClassName()));
         //from extended
@@ -60,6 +61,7 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
         }
 
         super.importClasses();
+        LOGGER.debug("Classes to import: {}", classesToImport);
     }
 
     /**
@@ -68,6 +70,7 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
      */
     @Override
     protected void doBuildCode() {
+        LOGGER.debug("building code {}",className);
         codeLines = new ArrayList<>();
         codeLines.add(getPackageDeclaration());
         MethodUtil.importClassesFromMethods(methods, classesToImport);
