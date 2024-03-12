@@ -27,7 +27,7 @@ import static com.camucode.gen.util.Constants.COMMA;
 /**
  * @author Diego Silva diego.silva at apuntesdejava.com
  */
-public class AnnotationType   {
+public class AnnotationType {
 
     ClassType classType;
     Map<String, Object> attributes;
@@ -51,7 +51,14 @@ public class AnnotationType   {
         } else {
             lines.add(annotation + "(");
             attributes.forEach((key, value) -> {
-                Object toValue = (value instanceof String) ? (String.format("\"%s\"", value)) : value;
+                Object toValue;
+                if (value instanceof ClassType) {
+                    toValue = ((ClassType) value).getClassName() + ".class";
+                } else if ((value instanceof Number) || (value instanceof Boolean)) {
+                    toValue = (String.format("%s", value));
+                } else {
+                    toValue = (String.format("\"%s\"", value));
+                }
                 lines.add(String.format("%s%s = %s,", getIndentation(1), key, toValue));
             });
             String lastLine = lines.get(lines.size() - 1);
@@ -61,6 +68,5 @@ public class AnnotationType   {
         }
         return lines;
     }
-
 
 }

@@ -15,6 +15,7 @@
  */
 package com.camucode.gen.util;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -23,20 +24,17 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ClassUtil {
 
+    public static final String[] NATIVE_TYPES = {"byte", "Byte", "short", "Short", "int", "Integer", "long", "Long", "float", "Float", "double", "Double", "boolean", "Boolean", "char", "Character", "String"};
+
     public static String removeClassFromPackage(String packageName, String className) {
         return StringUtils.substringBefore(packageName, "." + className);
     }
 
     public static boolean isNative(String className) {
-        try {
-            Class.forName("java.lang." + className);
-        } catch (ClassNotFoundException ex) {
-            return false;
-        }
-        return true;
+        return (ArrayUtils.contains(NATIVE_TYPES, className));
     }
 
-    public static boolean isNotNative(String className){
+    public static boolean isNotNative(String className) {
         return !isNative(className);
     }
 

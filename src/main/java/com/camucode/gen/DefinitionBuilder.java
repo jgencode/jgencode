@@ -16,6 +16,7 @@
 package com.camucode.gen;
 
 import com.camucode.gen.type.AnnotationType;
+import com.camucode.gen.type.ClassType;
 import com.camucode.gen.values.Modifier;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -66,8 +67,8 @@ public abstract class DefinitionBuilder {
      * Create a builder for the definition of a class.
      *
      * @param packageDefinition The definition of the package to which the class belongs. It should be separated by
-     *                          points, just like a package.
-     * @param className         The name of the class to create
+     * points, just like a package.
+     * @param className The name of the class to create
      * @return {@link ClassDefinitionBuilder} itself
      */
     public static ClassDefinitionBuilder createClassBuilder(String packageDefinition, String className) {
@@ -77,6 +78,7 @@ public abstract class DefinitionBuilder {
     public static RecordDefinitionBuilder createRecordBuilder(String packageDefinition, String className) {
         return new RecordDefinitionBuilder(packageDefinition, className);
     }
+
     public static InterfaceDefinitionBuilder createInterfaceBuilder(String packageDefinition, String interfaceName) {
         return new InterfaceDefinitionBuilder(packageDefinition, interfaceName);
     }
@@ -142,8 +144,8 @@ public abstract class DefinitionBuilder {
         //from fields
         if (fields != null) {
             classesToImport.addAll(fields.stream().filter(
-                    field -> field.getClassType() != null && StringUtils.isNotBlank(
-                        field.getClassType().getPackageName())).map(field -> field.getClassType().getFullClassName())
+                field -> field.getClassType() != null && StringUtils.isNotBlank(
+                field.getClassType().getPackageName())).map(field -> field.getClassType().getFullClassName())
                 .filter(
                     StringUtils::isNotBlank).collect(Collectors.toSet()));
             //from annotation
@@ -155,7 +157,10 @@ public abstract class DefinitionBuilder {
         //from class annotations
         annotationTypes.forEach(annotationType -> classesToImport.add(annotationType.getClassType()
             .getFullClassName()));
-
+        annotationTypes.stream().flatMap(annotationType -> annotationType.getAttributes().values().stream())
+            .filter(value -> value instanceof ClassType)
+            .map(ClassType.class::cast)
+            .forEach(classType -> classesToImport.add(classType.getFullClassName()));
 
         classesToImport.forEach(classToImport -> codeLines.add(String.format("import %s;", classToImport)));
     }
