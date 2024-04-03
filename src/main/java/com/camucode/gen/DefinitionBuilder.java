@@ -46,6 +46,7 @@ public abstract class DefinitionBuilder {
 
     protected List<String> codeLines;
     protected Set<String> classesToImport = new TreeSet<>();
+    protected Set<ClassType> classesTypeToImport = new LinkedHashSet<>();
     protected Collection<FieldDefinitionBuilder.FieldDefinition> fields;
     protected Set<AnnotationType> annotationTypes = new LinkedHashSet<>();
     static int spaceIndent = 4;
@@ -67,8 +68,8 @@ public abstract class DefinitionBuilder {
      * Create a builder for the definition of a class.
      *
      * @param packageDefinition The definition of the package to which the class belongs. It should be separated by
-     * points, just like a package.
-     * @param className The name of the class to create
+     *                          points, just like a package.
+     * @param className         The name of the class to create
      * @return {@link ClassDefinitionBuilder} itself
      */
     public static ClassDefinitionBuilder createClassBuilder(String packageDefinition, String className) {
@@ -81,6 +82,11 @@ public abstract class DefinitionBuilder {
 
     public static InterfaceDefinitionBuilder createInterfaceBuilder(String packageDefinition, String interfaceName) {
         return new InterfaceDefinitionBuilder(packageDefinition, interfaceName);
+    }
+
+    public DefinitionBuilder addClassToImport(ClassType classType) {
+        classesTypeToImport.add(classType);
+        return this;
     }
 
     public DefinitionBuilder addAnnotationType(AnnotationType annotationType) {
@@ -140,12 +146,14 @@ public abstract class DefinitionBuilder {
     }
 
     protected void importClasses() {
-
+        classesToImport.addAll(
+            classesTypeToImport.stream().map(ClassType::getFullClassName).collect(Collectors.toSet())
+        );
         //from fields
         if (fields != null) {
             classesToImport.addAll(fields.stream().filter(
-                field -> field.getClassType() != null && StringUtils.isNotBlank(
-                field.getClassType().getPackageName())).map(field -> field.getClassType().getFullClassName())
+                    field -> field.getClassType() != null && StringUtils.isNotBlank(
+                        field.getClassType().getPackageName())).map(field -> field.getClassType().getFullClassName())
                 .filter(
                     StringUtils::isNotBlank).collect(Collectors.toSet()));
             //from annotation
@@ -162,7 +170,10 @@ public abstract class DefinitionBuilder {
             .map(ClassType.class::cast)
             .forEach(classType -> classesToImport.add(classType.getFullClassName()));
 
-        classesToImport.forEach(classToImport -> codeLines.add(String.format("import %s;", classToImport)));
+        classesToImport
+            .stream()
+            .filter(clazz -> !clazz.equals("Override"))
+            .forEach(classToImport -> codeLines.add(String.format("import %s;", classToImport)));
     }
 
     public static class Definition {
