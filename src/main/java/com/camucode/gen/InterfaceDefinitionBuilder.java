@@ -16,6 +16,7 @@
 package com.camucode.gen;
 
 import com.camucode.gen.type.ClassType;
+import com.camucode.gen.type.ClassTypeBuilder;
 import com.camucode.gen.util.MethodUtil;
 import com.camucode.gen.values.Modifier;
 import org.apache.commons.lang3.StringUtils;
@@ -30,11 +31,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.camucode.gen.util.Constants.COMMA;
-import static com.camucode.gen.util.Constants.COMMA_SPACE;
-import static com.camucode.gen.util.Constants.GENERAL_CLASSES;
-import static com.camucode.gen.util.Constants.LESS_THAN;
-import static com.camucode.gen.util.Constants.MORE_THAN;
+import static com.camucode.gen.util.Constants.*;
+import static com.camucode.gen.util.Constants.PERIOD;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -98,9 +96,20 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
                     = interfaceExtend.getGenerics().values().stream().map(genericType -> {
                     if (genericType instanceof ClassType) {
                         var genericTypeParam = (ClassType) genericType;
-                        var classToImport = genericTypeParam.getFullClassName();
+                        String className = genericTypeParam.getClassName();
+                        String packageName = null;
+                        if (StringUtils.contains(className, PERIOD)) {
+                            className = StringUtils.substringAfterLast(genericTypeParam.getClassName(), PERIOD);
+                            packageName = StringUtils.substringBeforeLast(genericTypeParam.getClassName(), PERIOD);
+                        }
+                        var typeParam = ClassTypeBuilder.newBuilder()
+                            .className(className)
+                            .packageName(packageName)
+                            .build();
+
+                        var classToImport = typeParam.getFullClassName();
                         classesToImport.add(classToImport);
-                        return genericTypeParam.getClassName();
+                        return typeParam.getClassName();
                     }
                     if (GENERAL_CLASSES.containsKey((String) genericType)) {
                         classesToImport.add(GENERAL_CLASSES.get((String) genericType));

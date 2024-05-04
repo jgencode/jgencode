@@ -38,6 +38,10 @@ public class Constants {
 
     public static final String OPEN_BRACE = "{";
     public static final String CLOSE_BRACE = "}";
+
+    public static final String PERIOD = ".";
+
+    public static final String CLASSNAME_PARAMETER = "{_CLASSNAME_}";
     /**
      * "{@code \u003c}" caracter
      */

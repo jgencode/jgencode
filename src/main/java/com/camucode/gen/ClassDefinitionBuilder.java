@@ -16,6 +16,7 @@
 package com.camucode.gen;
 
 import com.camucode.gen.type.ClassType;
+import com.camucode.gen.type.ClassTypeBuilder;
 import com.camucode.gen.util.Constants;
 import com.camucode.gen.util.MethodUtil;
 import com.camucode.gen.values.Modifier;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.camucode.gen.util.Constants.*;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
@@ -41,6 +43,8 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
     private static final Logger LOGGER = LoggerFactory.getLogger(ClassDefinitionBuilder.class);
 
     private Collection<MethodDefinitionBuilder.MethodDefinition> methods;
+
+    private Collection<ConstructorDefinitionBuilder.ConstructorDefinition> constructors;
 
     private final Collection<ClassType> interfacesImplements = new LinkedHashSet<>();
 
@@ -70,7 +74,7 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
      */
     @Override
     protected void doBuildCode() {
-        LOGGER.debug("building code {}",className);
+        LOGGER.debug("building code {}", className);
         codeLines = new ArrayList<>();
         codeLines.add(getPackageDeclaration());
         MethodUtil.importClassesFromMethods(methods, classesToImport);
@@ -97,6 +101,14 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
             codeLines.addAll(createAccessors());
         }
 
+        if (constructors != null) {
+            constructors.forEach(constructor -> codeLines.addAll(constructor.getSourceLines().stream()
+                .map(line -> StringUtils.replace(line, CLASSNAME_PARAMETER, className))
+                .map(
+                    line -> String.format("%s%s", getIndentation(1), line)).collect(toList()))
+            );
+        }
+
         if (methods != null) {
             methods.forEach(method -> codeLines.addAll(method.getSourceLines().stream().map(
                 line -> String.format("%s%s", getIndentation(1), line)).collect(toList()))
@@ -108,9 +120,41 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
 
     private void addClassExtendedToDeclaration(StringBuilder classDeclaration) {
         if (classExtended == null) return;
-        classDeclaration.append(" extends ")
-            .append(classExtended.getClassName())
-            .append(SPACE);
+
+        var declaration = new StringBuilder(classExtended.getClassName());
+        if (classExtended.getGenerics() != null) {
+            declaration.append(LESS_THAN);
+            var params
+                = classExtended.getGenerics().values().stream().map(genericType -> {
+                if (genericType instanceof ClassType) {
+                    var genericTypeParam = (ClassType) genericType;
+                    String className = genericTypeParam.getClassName();
+                    String packageName = null;
+                    if (StringUtils.contains(className, PERIOD)) {
+                        className = StringUtils.substringAfterLast(genericTypeParam.getClassName(), PERIOD);
+                        packageName = StringUtils.substringBeforeLast(genericTypeParam.getClassName(), PERIOD);
+                    }
+                    var typeParam = ClassTypeBuilder.newBuilder()
+                        .className(className)
+                        .packageName(packageName)
+                        .build();
+
+                    var classToImport = typeParam.getFullClassName();
+                    classesToImport.add(classToImport);
+                    return typeParam.getClassName();
+                }
+                if (GENERAL_CLASSES.containsKey((String) genericType)) {
+                    classesToImport.add(GENERAL_CLASSES.get((String) genericType));
+                }
+                return (String) genericType;
+
+            }).collect(Collectors.joining(COMMA_SPACE));
+            declaration.append(params);
+            declaration.append(MORE_THAN);
+        }
+
+        classDeclaration.append(" extends ").append(declaration);
+
     }
 
     private void addInterfaceImplementsToDeclaration(StringBuilder classDeclaration) {
@@ -162,6 +206,11 @@ public class ClassDefinitionBuilder extends DefinitionBuilder implements Definit
     public ClassDefinitionBuilder addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methodDefinitions) {
         Optional.ofNullable(this.methods).orElseGet(() -> this.methods = new LinkedHashSet<>())
             .addAll(methodDefinitions);
+        return this;
+    }
+
+    public ClassDefinitionBuilder addConstructor(ConstructorDefinitionBuilder.ConstructorDefinition constructorDefinition) {
+        Optional.ofNullable(this.constructors).orElseGet(() -> this.constructors = new LinkedHashSet<>()).add(constructorDefinition);
         return this;
     }
 

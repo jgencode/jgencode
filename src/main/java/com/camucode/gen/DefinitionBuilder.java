@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import static com.camucode.gen.util.Constants.PERIOD;
 import static com.camucode.gen.util.Constants.SEARCH_DOT;
 import static java.util.stream.Collectors.toList;
 
@@ -173,6 +174,10 @@ public abstract class DefinitionBuilder {
         classesToImport
             .stream()
             .filter(clazz -> !clazz.equals("Override"))
+            .filter(clazz -> {
+                var packageClassName = StringUtils.substringBeforeLast(clazz, PERIOD);
+                return !StringUtils.equals(packageClassName, packageDefinition);
+            })
             .forEach(classToImport -> codeLines.add(String.format("import %s;", classToImport)));
     }
 
