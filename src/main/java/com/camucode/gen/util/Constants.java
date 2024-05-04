@@ -17,6 +17,7 @@ package com.camucode.gen.util;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -63,5 +64,5 @@ public class Constants {
      */
     public static final Map<String, String> GENERAL_CLASSES = Map.of("UUID", UUID.class.getName(), "LocalDate",
         LocalDate.class.getName(), "LocalDateTime", LocalDateTime.class.getName(), "Optional", Optional.class.getName(),
-        "Stream", Stream.class.getName());
+        "Stream", Stream.class.getName(), "List", List.class.getName());
 }
