@@ -23,16 +23,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.camucode.gen.util.Constants.*;
-import static com.camucode.gen.util.Constants.PERIOD;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -52,6 +46,26 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
     public DefinitionBuilder addInterfaceExtend(ClassType interfaceType) {
         interfacesExtends.add(interfaceType);
         return this;
+    }
+
+    @Override
+    protected void importClasses() {
+        LOGGER.debug("import classes from interface definition {}", className);
+
+        //from extended
+        interfacesExtends.forEach(interfaceExtend -> {
+            classesToImport.add(interfaceExtend.getFullClassName());
+            Optional.ofNullable(interfaceExtend.getGenerics()).ifPresent(generics -> {
+                classesToImport.addAll(
+                    generics.values().stream().filter(value -> value instanceof ClassType)
+                        .map(ClassType.class::cast)
+                        .map(ClassType::getFullClassName)
+                        .collect(toList()));
+            });
+        });
+
+        super.importClasses();
+        LOGGER.debug("Classes to import: {}", classesToImport);
     }
 
     @Override
@@ -101,7 +115,7 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
                         if (StringUtils.contains(className, PERIOD)) {
                             className = StringUtils.substringAfterLast(genericTypeParam.getClassName(), PERIOD);
                             packageName = StringUtils.substringBeforeLast(genericTypeParam.getClassName(), PERIOD);
-                        }
+                        } else className = genericTypeParam.getFullClassName();
                         var typeParam = ClassTypeBuilder.newBuilder()
                             .className(className)
                             .packageName(packageName)
