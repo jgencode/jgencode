@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen;
+package com.jgencode.gen;
 
-import com.camucode.gen.values.Modifier;
+import com.jgencode.gen.values.Modifier;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-import static com.camucode.gen.util.Constants.COMMA_SPACE;
+import static com.jgencode.gen.util.Constants.COMMA_SPACE;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
@@ -29,6 +29,11 @@ import static org.apache.commons.lang3.StringUtils.SPACE;
  */
 public class RecordDefinitionBuilder extends DefinitionBuilder {
 
+    /**
+     *
+     * @param packageDefinition
+     * @param className
+     */
     public RecordDefinitionBuilder(String packageDefinition, String className) {
         super(packageDefinition, className);
     }
@@ -43,8 +48,8 @@ public class RecordDefinitionBuilder extends DefinitionBuilder {
         recordDeclaration.append(SPACE).append("record ").append(className).append('(');
         if (fields != null) {
             recordDeclaration.append(
-                fields.stream().map(field -> field.getFieldType() + SPACE + field.getFieldName()).collect(
-                    Collectors.joining(COMMA_SPACE))
+                    fields.stream().map(field -> field.getFieldType() + SPACE + field.getFieldName()).collect(
+                            Collectors.joining(COMMA_SPACE))
             );
         }
         recordDeclaration.append(')');

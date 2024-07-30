@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen;
+package com.jgencode.gen;
 
-import com.camucode.gen.type.AnnotationType;
-import com.camucode.gen.type.JavaType;
+import com.jgencode.gen.type.AnnotationType;
+import com.jgencode.gen.type.JavaType;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -38,25 +38,48 @@ public class ParameterDefinitionBuilder {
 
     }
 
+    /**
+     *
+     * @param parameterName
+     * @return
+     */
     public ParameterDefinitionBuilder parameterName(String parameterName) {
         this.parameterName = parameterName;
         return this;
     }
 
+    /**
+     *
+     * @param parameterType
+     * @return
+     */
     public ParameterDefinitionBuilder parameterType(JavaType parameterType) {
         this.parameterType = parameterType;
         return this;
     }
 
+    /**
+     *
+     * @param annotationType
+     * @return
+     */
     public ParameterDefinitionBuilder addAnnotation(AnnotationType annotationType) {
         this.annotationTypes.add(annotationType);
         return this;
     }
 
+    /**
+     *
+     * @return
+     */
     public static ParameterDefinitionBuilder newBuilder() {
         return new ParameterDefinitionBuilder();
     }
 
+    /**
+     *
+     * @return
+     */
     public ParameterDefinition build() {
         ParameterDefinition definition = new ParameterDefinition();
         definition.annotationTypes = annotationTypes;

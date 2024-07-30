@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen.type;
+package com.jgencode.gen.type;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Constructor class to define an annotation
+ */
 public class AnnotationTypeBuilder {
 
     private ClassType classType;
@@ -27,21 +30,40 @@ public class AnnotationTypeBuilder {
     private AnnotationTypeBuilder() {
 
     }
-
+/**
+ * 
+ * @return 
+ */
     public static AnnotationTypeBuilder newBuilder() {
         return new AnnotationTypeBuilder();
     }
-
+/**
+ * 
+ * @param classType
+ * @return 
+ */
     public AnnotationTypeBuilder classType(ClassType classType) {
         this.classType = classType;
         return this;
     }
 
+    /**
+     * Add an annotation attribute
+     *
+     * @param name  attribute name
+     * @param value attribute value
+     * @return the same object
+     */
     public AnnotationTypeBuilder addAttribute(String name, Object value) {
         attributes.put(name, value);
         return this;
     }
 
+    /**
+     * Build the annotation type
+     *
+     * @return the annotation type #AnnotationType
+     */
     public AnnotationType build() {
         AnnotationType annotationType = new AnnotationType();
         annotationType.classType = classType;

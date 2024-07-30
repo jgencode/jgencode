@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen;
+package com.jgencode.gen;
 
-import com.camucode.gen.type.AnnotationType;
-import com.camucode.gen.type.JavaType;
-import com.camucode.gen.values.Modifier;
+import com.jgencode.gen.type.AnnotationType;
+import com.jgencode.gen.type.JavaType;
+import com.jgencode.gen.values.Modifier;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,15 +31,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.camucode.gen.DefinitionBuilder.getIndentation;
-import static com.camucode.gen.util.Constants.CLOSE_BRACE;
-import static com.camucode.gen.util.Constants.COMMA;
-import static com.camucode.gen.util.Constants.OPEN_BRACE;
-import static com.camucode.gen.util.Constants.SEMI_COLON;
+import static com.jgencode.gen.DefinitionBuilder.getIndentation;
+import static com.jgencode.gen.util.Constants.CLOSE_BRACE;
+import static com.jgencode.gen.util.Constants.COMMA;
+import static com.jgencode.gen.util.Constants.OPEN_BRACE;
+import static com.jgencode.gen.util.Constants.SEMI_COLON;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
 /**
+ * Constructor class to define a method
+ *
  * @author Diego Silva diego.silva at apuntesdejava.com
  */
 public class MethodDefinitionBuilder {
@@ -51,55 +53,99 @@ public class MethodDefinitionBuilder {
     private JavaType returnType;
     private final Set<Modifier> modifiers = new LinkedHashSet<>();
     private final Set<ParameterDefinition> parameters = new LinkedHashSet<>();
-    public Set<AnnotationType> annotationTypes = new LinkedHashSet<>();
+    private final Set<AnnotationType> annotationTypes;
 
     private String body;
 
     private boolean isAbstract;
 
     private MethodDefinitionBuilder() {
+        this.annotationTypes = new LinkedHashSet<>();
 
     }
 
+    /**
+     *
+     * @return
+     */
     public static MethodDefinitionBuilder createBuilder() {
         return new MethodDefinitionBuilder();
     }
 
+    /**
+     *
+     * @param name
+     * @return
+     */
     public MethodDefinitionBuilder name(String name) {
         this.name = name;
         return this;
     }
 
+    /**
+     *
+     * @param body
+     * @return
+     */
     public MethodDefinitionBuilder body(String body) {
         this.body = body;
         return this;
     }
 
+    /**
+     *
+     * @param isAbstract
+     * @return
+     */
     public MethodDefinitionBuilder isAbstract(boolean isAbstract) {
         this.isAbstract = isAbstract;
         return this;
     }
 
+    /**
+     *
+     * @param returnType
+     * @return
+     */
     public MethodDefinitionBuilder returnClassType(JavaType returnType) {
         this.returnType = returnType;
         return this;
     }
 
+    /**
+     *
+     * @param modifier
+     * @return
+     */
     public MethodDefinitionBuilder addModifier(Modifier modifier) {
         this.modifiers.add(modifier);
         return this;
     }
 
+    /**
+     *
+     * @param parameterDefinition
+     * @return
+     */
     public MethodDefinitionBuilder addParameter(ParameterDefinition parameterDefinition) {
         parameters.add(parameterDefinition);
         return this;
     }
 
+    /**
+     *
+     * @param parameterDefinitions
+     * @return
+     */
     public MethodDefinitionBuilder parameters(Collection<ParameterDefinition> parameterDefinitions) {
         this.parameters.addAll(parameterDefinitions);
         return this;
     }
 
+    /**
+     *
+     * @return
+     */
     public MethodDefinition build() {
         LOGGER.debug("new method definition build");
         MethodDefinition methodDefinition = new MethodDefinition();
@@ -125,7 +171,7 @@ public class MethodDefinitionBuilder {
             sourceString.append(SPACE);
         }
         Optional.ofNullable(returnType).ifPresentOrElse(type -> sourceString.append(type.getFullName()),
-            () -> sourceString.append("void"));
+                () -> sourceString.append("void"));
 
         sourceString.append(SPACE).append(name);
         sourceString.append("(");
@@ -156,25 +202,33 @@ public class MethodDefinitionBuilder {
             return;
         }
         var paramsToInsert = parameters.stream()
-            .filter(parameterDefinition -> Objects.nonNull(parameterDefinition.parameterName))
-            .map(parameter -> String.format("%s %s %s",
-            parameter.getAnnotationSource(),
-            parameter.getParameterType() == null ? EMPTY : parameter.getParameterType().getFullName(),
-            parameter.getParameterName()
+                .filter(parameterDefinition -> Objects.nonNull(parameterDefinition.parameterName))
+                .map(parameter -> String.format("%s %s %s",
+                parameter.getAnnotationSource(),
+                parameter.getParameterType() == null ? EMPTY : parameter.getParameterType().getFullName(),
+                parameter.getParameterName()
         )).collect(Collectors.joining(COMMA));
         if (StringUtils.isNotBlank(paramsToInsert)) {
             sourceString.append(paramsToInsert);
         }
     }
 
+    /**
+     *
+     * @param annotationType
+     * @return
+     */
     public MethodDefinitionBuilder addAnnotationType(AnnotationType annotationType) {
         this.annotationTypes.add(annotationType);
         return this;
     }
 
+    /**
+     * Definition of method
+     */
     public static class MethodDefinition {
 
-        public Set<AnnotationType> annotationTypes;
+        private Set<AnnotationType> annotationTypes;
         private String name;
         private JavaType returnType;
         private Set<Modifier> modifiers;
@@ -186,26 +240,54 @@ public class MethodDefinitionBuilder {
 
         }
 
+        public Set<AnnotationType> getAnnotationTypes() {
+            return annotationTypes;
+        }
+
+        /**
+         *
+         * @return
+         */
         public JavaType getReturnType() {
             return returnType;
         }
 
+        /**
+         *
+         * @return
+         */
         public Set<Modifier> getModifiers() {
             return modifiers;
         }
 
+        /**
+         *
+         * @return
+         */
         public Set<ParameterDefinition> getParameters() {
             return parameters;
         }
 
+        /**
+         *
+         * @return
+         */
         public List<String> getSourceLines() {
             return sourceLines;
         }
 
+        /**
+         *
+         * @return
+         */
         public String getBody() {
             return body;
         }
 
+        /**
+         *
+         * @return
+         */
         public String getName() {
             return name;
         }

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen;
+package com.jgencode.gen;
 
-import com.camucode.gen.type.AnnotationType;
-import com.camucode.gen.type.JavaType;
+import com.jgencode.gen.type.AnnotationType;
+import com.jgencode.gen.type.JavaType;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -39,27 +39,46 @@ public class ParameterDefinition {
 
     }
 
+    /**
+     *
+     * @return
+     */
     public String getParameterName() {
         return parameterName;
     }
 
+    /**
+     *
+     * @return
+     */
     public JavaType getParameterType() {
         return parameterType;
     }
 
+    /**
+     *
+     * @return
+     */
     public Set<AnnotationType> getAnnotationTypes() {
         return annotationTypes;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getSourceCode() {
         return sourceCode;
     }
 
-
+    /**
+     *
+     * @return
+     */
     public String getAnnotationSource() {
         StringBuilder source = new StringBuilder();
         annotationTypes.forEach(annotationType -> source.append(String.join(SPACE,
-            annotationType.createSourceLines())));
+                annotationType.createSourceLines())));
         return source.toString();
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen.type;
+package com.jgencode.gen.type;
 
 /**
  *
@@ -27,15 +27,28 @@ public class NativeTypeBuilder {
 
     }
 
+    /**
+     *
+     * @return
+     */
     public static NativeTypeBuilder newBuilder() {
         return new NativeTypeBuilder();
     }
 
+    /**
+     *
+     * @param name
+     * @return
+     */
     public NativeTypeBuilder name(String name) {
         this.name = name;
         return this;
     }
 
+    /**
+     *
+     * @return
+     */
     public NativeType build() {
         return new NativeType(name);
     }

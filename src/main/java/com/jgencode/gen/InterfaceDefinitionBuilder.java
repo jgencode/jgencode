@@ -13,12 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen;
+package com.jgencode.gen;
 
-import com.camucode.gen.type.ClassType;
-import com.camucode.gen.type.ClassTypeBuilder;
-import com.camucode.gen.util.MethodUtil;
-import com.camucode.gen.values.Modifier;
+import com.jgencode.gen.type.ClassType;
+import com.jgencode.gen.type.ClassTypeBuilder;
+import static com.jgencode.gen.util.Constants.COMMA;
+import static com.jgencode.gen.util.Constants.COMMA_SPACE;
+import static com.jgencode.gen.util.Constants.GENERAL_CLASSES;
+import static com.jgencode.gen.util.Constants.LESS_THAN;
+import static com.jgencode.gen.util.Constants.MORE_THAN;
+import static com.jgencode.gen.util.Constants.PERIOD;
+import com.jgencode.gen.util.MethodUtil;
+import com.jgencode.gen.values.Modifier;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +32,11 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.camucode.gen.util.Constants.*;
 import static java.util.stream.Collectors.toList;
 
 /**
+ * Interface definition constructor class
+ *
  * @author Diego Silva diego.silva at apuntesdejava.com
  */
 public class InterfaceDefinitionBuilder extends DefinitionBuilder implements DefinitionBuilderWithMethods {
@@ -43,6 +50,11 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
         super(packageDefinition, className);
     }
 
+    /**
+     *
+     * @param interfaceType
+     * @return
+     */
     public DefinitionBuilder addInterfaceExtend(ClassType interfaceType) {
         interfacesExtends.add(interfaceType);
         return this;
@@ -57,10 +69,10 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
             classesToImport.add(interfaceExtend.getFullClassName());
             Optional.ofNullable(interfaceExtend.getGenerics()).ifPresent(generics -> {
                 classesToImport.addAll(
-                    generics.values().stream().filter(value -> value instanceof ClassType)
-                        .map(ClassType.class::cast)
-                        .map(ClassType::getFullClassName)
-                        .collect(toList()));
+                        generics.values().stream().filter(value -> value instanceof ClassType)
+                                .map(ClassType.class::cast)
+                                .map(ClassType::getFullClassName)
+                                .collect(toList()));
             });
         });
 
@@ -93,13 +105,12 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
 
         if (methods != null) {
             methods.forEach(method -> codeLines.addAll(method.getSourceLines().stream().map(
-                line -> String.format("%s%s", getIndentation(1), line)).collect(toList()))
+                    line -> String.format("%s%s", getIndentation(1), line)).collect(toList()))
             );
         }
 
         codeLines.add("}");
     }
-
 
     private void addInterfacesExtendsCode(StringBuilder classDeclaration) {
         var interfacesExtendsCode = interfacesExtends.stream().map(interfaceExtend -> {
@@ -107,30 +118,32 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
             if (interfaceExtend.getGenerics() != null) {
                 declaration.append(LESS_THAN);
                 var params
-                    = interfaceExtend.getGenerics().values().stream().map(genericType -> {
-                    if (genericType instanceof ClassType) {
-                        var genericTypeParam = (ClassType) genericType;
-                        String className = genericTypeParam.getClassName();
-                        String packageName = null;
-                        if (StringUtils.contains(className, PERIOD)) {
-                            className = StringUtils.substringAfterLast(genericTypeParam.getClassName(), PERIOD);
-                            packageName = StringUtils.substringBeforeLast(genericTypeParam.getClassName(), PERIOD);
-                        } else className = genericTypeParam.getFullClassName();
-                        var typeParam = ClassTypeBuilder.newBuilder()
-                            .className(className)
-                            .packageName(packageName)
-                            .build();
+                        = interfaceExtend.getGenerics().values().stream().map(genericType -> {
+                            if (genericType instanceof ClassType genericTypeParam) {
+                                String className = genericTypeParam.getClassName();
+                                String packageName = null;
+                                if (StringUtils.contains(className, PERIOD)) {
+                                    className = StringUtils.substringAfterLast(genericTypeParam.getClassName(), PERIOD);
+                                    packageName = StringUtils.substringBeforeLast(genericTypeParam.getClassName(),
+                                            PERIOD);
+                                } else {
+                                    className = genericTypeParam.getFullClassName();
+                                }
+                                var typeParam = ClassTypeBuilder.newBuilder()
+                                        .className(className)
+                                        .packageName(packageName)
+                                        .build();
 
-                        var classToImport = typeParam.getFullClassName();
-                        classesToImport.add(classToImport);
-                        return typeParam.getClassName();
-                    }
-                    if (GENERAL_CLASSES.containsKey((String) genericType)) {
-                        classesToImport.add(GENERAL_CLASSES.get((String) genericType));
-                    }
-                    return (String) genericType;
+                                var classToImport = typeParam.getFullClassName();
+                                classesToImport.add(classToImport);
+                                return typeParam.getClassName();
+                            }
+                            if (GENERAL_CLASSES.containsKey((String) genericType)) {
+                                classesToImport.add(GENERAL_CLASSES.get((String) genericType));
+                            }
+                            return (String) genericType;
 
-                }).collect(Collectors.joining(COMMA_SPACE));
+                        }).collect(Collectors.joining(COMMA_SPACE));
                 declaration.append(params);
                 declaration.append(MORE_THAN);
             }
@@ -142,11 +155,18 @@ public class InterfaceDefinitionBuilder extends DefinitionBuilder implements Def
     }
 
     @Override
-    public DefinitionBuilderWithMethods addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methodDefinitions) {
-        Optional.ofNullable(this.methods).orElseGet(() -> this.methods = new LinkedHashSet<>()).addAll(methodDefinitions);
+    public DefinitionBuilderWithMethods addMethods(
+            Collection<MethodDefinitionBuilder.MethodDefinition> methodDefinitions) {
+        Optional.ofNullable(this.methods).orElseGet(() -> this.methods = new LinkedHashSet<>()).
+                addAll(methodDefinitions);
         return this;
     }
 
+    /**
+     *
+     * @param methodDefinition
+     * @return
+     */
     @Override
     public DefinitionBuilderWithMethods addMethod(MethodDefinitionBuilder.MethodDefinition methodDefinition) {
         Optional.ofNullable(this.methods).orElseGet(() -> this.methods = new LinkedHashSet<>()).add(methodDefinition);

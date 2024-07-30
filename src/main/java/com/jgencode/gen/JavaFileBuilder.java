@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen;
+package com.jgencode.gen;
 
-import com.camucode.gen.DefinitionBuilder.Definition;
+import com.jgencode.gen.DefinitionBuilder.Definition;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
+ * Constructor class that allows creating the .java file
+ *
  * @author diego.silva
  */
 public class JavaFileBuilder {
@@ -34,6 +36,9 @@ public class JavaFileBuilder {
         this.destinationPath = destinationPath;
     }
 
+    /**
+     * Class about Java File
+     */
     public static class JavaFile {
 
         private final Definition definition;
@@ -44,23 +49,36 @@ public class JavaFileBuilder {
             this.destinationPath = destinationPath;
         }
 
+        /**
+         *
+         * @return 
+         * @throws java.io.IOException
+         */
         public Path writeFile() throws IOException {
             Path javaFilePath = destinationPath.resolve(definition.getPackagePath())
-                .resolve(Path.of(String.format(
-                    "%s.java", definition.getClassName())));
+                    .resolve(Path.of(String.format(
+                            "%s.java", definition.getClassName())));
             Files.createDirectories(javaFilePath.getParent());
             return Files.write(javaFilePath, definition.getCodeLines());
         }
 
     }
 
+    /**
+     *
+     * @param definition
+     * @param destinationPath
+     * @return
+     */
     public static JavaFileBuilder createBuilder(Definition definition, Path destinationPath) {
-        JavaFileBuilder builder = new JavaFileBuilder(definition, destinationPath);
-        return builder;
+        return new JavaFileBuilder(definition, destinationPath);
     }
 
+    /**
+     *
+     * @return
+     */
     public JavaFile build() {
-        JavaFile javaFile = new JavaFile(definition, destinationPath);
-        return javaFile;
+        return new JavaFile(definition, destinationPath);
     }
 }

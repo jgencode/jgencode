@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen;
+package com.jgencode.gen;
 
-import com.camucode.gen.type.AnnotationType;
-import com.camucode.gen.type.ClassType;
-import com.camucode.gen.values.Modifier;
+import com.jgencode.gen.type.AnnotationType;
+import com.jgencode.gen.type.ClassType;
+import com.jgencode.gen.values.Modifier;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -26,15 +26,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.camucode.gen.util.Constants.SEMI_COLON;
+import static com.jgencode.gen.util.Constants.SEMI_COLON;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.SPACE;
 
 /**
+ * Field definition constructor class
+ *
  * @author Diego Silva diego.silva at apuntesdejava.com
  */
 public class FieldDefinitionBuilder {
 
+    /**
+     *
+     * @return
+     */
     public static FieldDefinitionBuilder createBuilder() {
         return new FieldDefinitionBuilder();
     }
@@ -54,46 +60,90 @@ public class FieldDefinitionBuilder {
 
     }
 
+    /**
+     *
+     * @param fieldName
+     * @return
+     */
     public FieldDefinitionBuilder fieldName(String fieldName) {
         this.fieldName = fieldName;
         return this;
     }
 
+    /**
+     *
+     * @param nativeType
+     * @return
+     */
     public FieldDefinitionBuilder nativeType(String nativeType) {
         this.nativeType = nativeType;
         return this;
     }
 
+    /**
+     *
+     * @param classType
+     * @return
+     */
     public FieldDefinitionBuilder classType(ClassType classType) {
         this.classType = classType;
         return this;
     }
 
+    /**
+     *
+     * @param modifier
+     * @return
+     */
     public FieldDefinitionBuilder addModifier(Modifier modifier) {
         this.modifiers.add(modifier);
         return this;
     }
 
+    /**
+     *
+     * @param annotationType
+     * @return
+     */
     public FieldDefinitionBuilder addAnnotationType(AnnotationType annotationType) {
         this.annotationTypes.add(annotationType);
         return this;
     }
 
+    /**
+     *
+     * @param setter
+     * @return
+     */
     public FieldDefinitionBuilder setter(boolean setter) {
         this.setter = setter;
         return this;
     }
 
+    /**
+     *
+     * @param getter
+     * @return
+     */
     public FieldDefinitionBuilder getter(boolean getter) {
         this.getter = getter;
         return this;
     }
 
+    /**
+     *
+     * @param defaultValue
+     * @return
+     */
     public FieldDefinitionBuilder defaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
         return this;
     }
 
+    /**
+     *
+     * @return
+     */
     public FieldDefinition build() {
         FieldDefinition fieldDefinition = new FieldDefinition();
         fieldDefinition.classType = classType;
@@ -114,7 +164,7 @@ public class FieldDefinitionBuilder {
 
         var sourceLine = new StringBuilder();
         sourceLine.append(Modifier.currentAccessModifier(modifiers))
-            .append(SPACE);
+                .append(SPACE);
         if (StringUtils.isBlank(nativeType)) {
             sourceLine.append(classType.getClassName());
         } else {
@@ -132,10 +182,13 @@ public class FieldDefinitionBuilder {
         return lines;
     }
 
+    /**
+     * Field definition class
+     */
     public static class FieldDefinition {
 
-        public Set<AnnotationType> annotationType;
-        public String defaultValue;
+        private Set<AnnotationType> annotationType;
+        private String defaultValue;
         private String fieldName;
         private String nativeType;
         private ClassType classType;
@@ -144,38 +197,74 @@ public class FieldDefinitionBuilder {
         private boolean getter;
         List<String> sourceLines;
 
+        /**
+         *
+         * @return
+         */
         public String getFieldName() {
             return fieldName;
         }
 
+        /**
+         *
+         * @return
+         */
         public String getFieldType() {
             return Optional.ofNullable(classType).map(ClassType::getClassName).orElse(nativeType);
         }
 
+        /**
+         *
+         * @return
+         */
         public Set<AnnotationType> getAnnotationType() {
             return annotationType;
         }
 
+        /**
+         *
+         * @return
+         */
         public String getNativeType() {
             return nativeType;
         }
 
+        /**
+         *
+         * @return
+         */
         public ClassType getClassType() {
             return classType;
         }
 
+        /**
+         *
+         * @return
+         */
         public Set<Modifier> getModifiers() {
             return modifiers;
         }
 
+        /**
+         *
+         * @return
+         */
         public boolean isSetter() {
             return setter;
         }
 
+        /**
+         *
+         * @return
+         */
         public boolean isGetter() {
             return getter;
         }
 
+        /**
+         *
+         * @return
+         */
         public List<String> getSourceLines() {
             return sourceLines;
         }
