@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen.type;
+package com.jgencode.gen.type;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.camucode.gen.DefinitionBuilder.getIndentation;
-import static com.camucode.gen.util.Constants.COMMA;
+import static com.jgencode.gen.DefinitionBuilder.getIndentation;
+import static com.jgencode.gen.util.Constants.COMMA;
 
 /**
  * @author Diego Silva diego.silva at apuntesdejava.com
@@ -35,14 +35,26 @@ public class AnnotationType {
     AnnotationType() {
     }
 
+    /**
+     *
+     * @return
+     */
     public ClassType getClassType() {
         return classType;
     }
 
+    /**
+     *
+     * @return
+     */
     public Map<String, Object> getAttributes() {
         return attributes;
     }
 
+    /**
+     *
+     * @return
+     */
     public List<String> createSourceLines() {
         List<String> lines = new ArrayList<>();
         String annotation = "@" + classType.getClassName();

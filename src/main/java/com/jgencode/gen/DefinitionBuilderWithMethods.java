@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen;
+package com.jgencode.gen;
 
 import java.util.Collection;
 
 /**
+ * Interface that specifies that a definition has methods
  *
  * @author Diego Silva diego.silva at apuntesdejava.com
  */
@@ -27,9 +28,15 @@ public interface DefinitionBuilderWithMethods {
      * Adds a method definition collection to the current class builder
      *
      * @param methods A collection of method definitions. See
-     * #{@link com.camucode.gen.MethodDefinitionBuilder.MethodDefinition}
+     * #{@link com.jgencode.gen.MethodDefinitionBuilder.MethodDefinition}
      * @return The current builder instance
      */
     DefinitionBuilderWithMethods addMethods(Collection<MethodDefinitionBuilder.MethodDefinition> methods);
+
+    /**
+     *
+     * @param methodDefinition
+     * @return
+     */
     DefinitionBuilderWithMethods addMethod(MethodDefinitionBuilder.MethodDefinition methodDefinition);
 }

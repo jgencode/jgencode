@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */package com.camucode.gen.type;
+ */package com.jgencode.gen.type;
 
 /**
  *
@@ -24,6 +24,10 @@ public class NativeType extends JavaType {
         super(name);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public String getFullName() {
         return super.getName();

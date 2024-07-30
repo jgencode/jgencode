@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen.values;
+package com.jgencode.gen.values;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,11 +25,21 @@ import java.util.Set;
  */
 public enum Modifier {
     PUBLIC, PRIVATE, PROTECTED, FINAL, ABSTRACT, STATIC;
+    /**
+     *
+     */
     public static final Set<Modifier> ACCESS_MODIFIERS = Set.of(Modifier.PUBLIC, Modifier.PRIVATE, Modifier.PROTECTED);
+    /**
+     *
+     */
     public static final Set<Modifier> METHOD_ACCESS_MODIFIERS = Set.of(Modifier.PUBLIC,
-        Modifier.PRIVATE,
-        Modifier.PROTECTED, ABSTRACT, STATIC);
-
+            Modifier.PRIVATE,
+            Modifier.PROTECTED, ABSTRACT, STATIC);
+/**
+ * 
+ * @param modifiers
+ * @return 
+ */
     public static String currentAccessModifier(Collection<Modifier> modifiers) {
         for (Modifier modifier : Modifier.ACCESS_MODIFIERS) {
             if (modifiers.contains(modifier)) {
@@ -38,7 +48,11 @@ public enum Modifier {
         }
         return StringUtils.EMPTY;
     }
-
+/**
+ * 
+ * @param modifiers
+ * @return 
+ */
     public static String currentMethodAccessModifier(Collection<Modifier> modifiers) {
         for (Modifier modifier : Modifier.METHOD_ACCESS_MODIFIERS) {
             if (modifiers.contains(modifier)) {

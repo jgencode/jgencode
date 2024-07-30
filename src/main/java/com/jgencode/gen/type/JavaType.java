@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen.type;
+package com.jgencode.gen.type;
 
 /**
  *
  * @author Diego Silva diego.silva at apuntesdejava.com
  */
 public abstract class JavaType {
-    
-     private String name;
+
+    private String name;
 
     /**
      * Get the value of name
@@ -41,11 +41,18 @@ public abstract class JavaType {
         this.name = name;
     }
 
-
+    /**
+     *
+     * @param name
+     */
     public JavaType(String name) {
         this.name = name;
     }
-    
+
+    /**
+     *
+     * @return
+     */
     public abstract String getFullName();
 
 }

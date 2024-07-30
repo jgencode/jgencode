@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen.util;
+package com.jgencode.gen.util;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,40 +29,51 @@ import java.util.stream.Stream;
 public class Constants {
 
     /**
-     * "{@code .}" caracter
+     * "{@code .}" character
      */
     public static final String SEARCH_DOT = "\\.";
     /**
-     * "{@code ;}" caracter
+     * "{@code ;}" character
      */
     public static final String SEMI_COLON = ";";
-
+    /**
+     *
+     */
     public static final String OPEN_BRACE = "{";
+
+    /**
+     *
+     */
     public static final String CLOSE_BRACE = "}";
-
+    /**
+     *
+     */
     public static final String PERIOD = ".";
-
+    /**
+     *
+     */
     public static final String CLASSNAME_PARAMETER = "{_CLASSNAME_}";
     /**
-     * "{@code \u003c}" caracter
+     * "{@code \u003c}" character
      */
     public static final String LESS_THAN = "<";
     /**
-     * "{@code \u003e}" caracter
+     * "{@code \u003e}" character
      */
     public static final String MORE_THAN = ">";
     /**
-     * "{@code ,}" caracter
+     * "{@code ,}" character
      */
     public static final String COMMA = ",";
     /**
-     * "{@code ,}" caracter
+     * "{@code ,}" character
      */
     public static final String COMMA_SPACE = ", ";
     /**
      * Class map with their respective complete package declaration
      */
     public static final Map<String, String> GENERAL_CLASSES = Map.of("UUID", UUID.class.getName(), "LocalDate",
-        LocalDate.class.getName(), "LocalDateTime", LocalDateTime.class.getName(), "Optional", Optional.class.getName(),
-        "Stream", Stream.class.getName(), "List", List.class.getName());
+            LocalDate.class.getName(), "LocalDateTime", LocalDateTime.class.getName(), "Optional", Optional.class.
+            getName(),
+            "Stream", Stream.class.getName(), "List", List.class.getName());
 }

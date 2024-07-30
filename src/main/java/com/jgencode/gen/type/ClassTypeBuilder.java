@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camucode.gen.type;
+package com.jgencode.gen.type;
 
-import com.camucode.gen.util.ClassUtil;
-import com.camucode.gen.util.Constants;
+import com.jgencode.gen.util.ClassUtil;
+import com.jgencode.gen.util.Constants;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import static com.camucode.gen.util.Constants.*;
+import static com.jgencode.gen.util.Constants.*;
 
 /**
  * @author Diego Silva diego.silva at apuntesdejava.com
@@ -34,15 +34,29 @@ public class ClassTypeBuilder {
     private String className;
     private final Map<String, Object> generics = new LinkedHashMap<>();
 
+    /**
+     *
+     * @return
+     */
     public static ClassTypeBuilder newBuilder() {
         return new ClassTypeBuilder();
     }
 
+    /**
+     *
+     * @param packageName
+     * @return
+     */
     public ClassTypeBuilder packageName(String packageName) {
         this.packageName = packageName;
         return this;
     }
 
+    /**
+     *
+     * @param className
+     * @return
+     */
     public ClassTypeBuilder className(String className) {
         if (StringUtils.contains(className, LESS_THAN) && StringUtils.endsWith(className, MORE_THAN)) {
             String generic = StringUtils.substringBetween(className, LESS_THAN, MORE_THAN);
@@ -50,9 +64,9 @@ public class ClassTypeBuilder {
             char key = 'T';
             for (String g : generics) {
                 addGeneric(String.valueOf(key++), ClassTypeBuilder.newBuilder()
-                    .className(g)
-                    .packageName(packageName)
-                    .build());
+                        .className(g)
+                        .packageName(packageName)
+                        .build());
             }
             this.className = StringUtils.substringBefore(className, LESS_THAN);
             if (Constants.GENERAL_CLASSES.containsKey(this.className)) {
@@ -64,12 +78,21 @@ public class ClassTypeBuilder {
         return this;
     }
 
-
+    /**
+     *
+     * @param key
+     * @param genericClass
+     * @return
+     */
     public ClassTypeBuilder addGeneric(String key, Object genericClass) {
         generics.put(key, genericClass);
         return this;
     }
 
+    /**
+     *
+     * @return
+     */
     public ClassType build() {
         var classType = new ClassType(packageName, className);
         if (!generics.isEmpty()) {
